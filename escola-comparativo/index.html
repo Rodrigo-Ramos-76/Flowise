@@ -1,847 +1,488 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Comparativo de Escolas — Gustavo 2026/2027</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-  body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; }
-  .card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-  .best { background: linear-gradient(135deg, #ffd700 0%, #ffec6e 100%); }
-  .good { background: linear-gradient(135deg, #c6efce 0%, #e8f5e9 100%); }
-  .warn { background: linear-gradient(135deg, #ffeb9c 0%, #fff8dc 100%); }
-  .bad  { background: linear-gradient(135deg, #ffc7ce 0%, #ffe4e8 100%); }
-  input[type=range] { accent-color: #4f46e5; }
-  .tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; font-weight: 700; }
-  .tab { cursor: pointer; padding: 10px 16px; border-bottom: 3px solid transparent; color: #6b7280; transition: all 0.2s; }
-  .tab:hover { color: #4f46e5; }
-  .school-toggle { transition: all 0.2s; }
-  .school-toggle:hover { transform: scale(1.02); }
-  select { background: white; }
-  @media (max-width: 768px) { .overflow-x-auto { overflow-x: auto; } }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;color:#1f2937;min-height:100vh}
+h1{font-size:1.4rem;font-weight:900;color:#1f2937}
+h2{font-size:1rem;font-weight:700;margin-bottom:12px;color:#374151}
+h3{font-size:.875rem;font-weight:700;margin-bottom:8px}
+.header{background:#fff;padding:20px 24px;border-bottom:1px solid #e5e7eb;margin-bottom:0}
+.header p{font-size:.8rem;color:#6b7280;margin-top:4px}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.badge{font-size:.7rem;padding:3px 10px;border-radius:999px;font-weight:600}
+.tabs{background:#fff;display:flex;overflow-x:auto;border-bottom:2px solid #e5e7eb}
+.tab{padding:12px 18px;cursor:pointer;font-size:.85rem;color:#6b7280;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.2s}
+.tab:hover{color:#4f46e5}
+.tab.active{color:#4f46e5;font-weight:700;border-bottom-color:#4f46e5}
+.content{padding:20px 16px;max-width:1200px;margin:0 auto}
+.card{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:16px;margin-bottom:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:900px){.grid4{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
+@media(max-width:480px){.grid4{grid-template-columns:1fr}}
+.school-card{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:14px;border:2px solid transparent;cursor:pointer;transition:.2s}
+.school-card:hover{transform:scale(1.02)}
+.school-card.selected{border-color:#4f46e5}
+.school-name{font-weight:700;font-size:.85rem}
+.school-mod{font-size:.75rem;color:#6b7280;margin-top:2px}
+.school-tag{font-size:.7rem;color:#d97706;font-weight:600;margin-top:4px}
+.school-total{font-size:1.3rem;font-weight:900;margin-top:8px}
+.school-sub{font-size:.75rem;color:#9ca3af}
+.school-alert{font-size:.7rem;color:#dc2626;background:#fef2f2;border-radius:6px;padding:4px 6px;margin-top:6px}
+.rank-badge{font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:999px;float:right}
+.rank1{background:#ffd700;color:#78350f}
+.rank2,.rank3{background:#c6efce;color:#14532d}
+.rank4,.rank5{background:#fef9c3;color:#713f12}
+.rank6,.rank7,.rank8{background:#fee2e2;color:#991b1b}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{text-align:left;padding:8px 10px;border-bottom:2px solid #e5e7eb;color:#6b7280;font-weight:600}
+th.center{text-align:center}
+td{padding:8px 10px;border-bottom:1px solid #f3f4f6}
+td.center{text-align:center}
+tr:hover td{background:#f9fafb}
+tr.bold td{font-weight:700;background:#eef2ff}
+tr.proj td{font-weight:700;background:#fefce8}
+.best-val{color:#059669;font-weight:700}
+.best-label{font-size:.65rem;color:#059669;display:block}
+.pros-card{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:16px;border-left:4px solid #ccc}
+.pro-item,.con-item{font-size:.78rem;color:#374151;margin-bottom:4px;display:flex;gap:6px}
+.pro-dot{color:#16a34a;flex-shrink:0}
+.con-dot{color:#ef4444;flex-shrink:0}
+.alert-box{background:#fef2f2;border-radius:8px;padding:8px;margin-top:8px}
+.alert-title{font-size:.72rem;font-weight:700;color:#dc2626;margin-bottom:4px}
+.alert-item{font-size:.72rem;color:#b91c1c;margin-bottom:2px}
+.info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px;margin-bottom:16px;font-size:.78rem;color:#1e40af}
+.warn-box{background:#fefce8;border:1px solid #fde68a;border-radius:10px;padding:12px;margin-bottom:16px;font-size:.78rem;color:#854d0e}
+.danger-box{background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:16px;border-left:4px solid #ef4444;margin-top:16px}
+.danger-title{font-weight:700;color:#dc2626;margin-bottom:8px}
+.danger-item{font-size:.82rem;margin-bottom:4px}
+label{font-size:.82rem;color:#374151;font-weight:500}
+select,input[type=range]{width:100%;margin-top:4px;margin-bottom:12px}
+select{border:1px solid #d1d5db;border-radius:8px;padding:8px;font-size:.82rem;background:#fff}
+input[type=range]{accent-color:#4f46e5}
+.range-labels{display:flex;justify-content:space-between;font-size:.7rem;color:#9ca3af;margin-top:-8px;margin-bottom:12px}
+.range-val{font-weight:700;color:#4f46e5;float:right}
+.checkbox-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.82rem;color:#374151}
+input[type=checkbox]{width:16px;height:16px;accent-color:#4f46e5}
+.analysis-box{background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:16px}
+.analysis-title{font-weight:700;color:#3730a3;margin-bottom:10px}
+.analysis-row{font-size:.82rem;color:#312e81;margin-bottom:6px}
+.analysis-note{background:#fff;border-radius:8px;padding:10px;font-size:.75rem;color:#4b5563;margin-top:10px}
+.page{display:none}
+.page.active{display:block}
 </style>
 </head>
 <body>
-<div id="root"></div>
-<script type="text/babel">
 
-const { useState, useMemo, useCallback } = React;
+<div class="header">
+  <h1>🏫 Comparativo de Escolas — Gustavo</h1>
+  <p>1º Ano Fundamental · Gênesis 2, Alphaville · 2026/2027</p>
+  <div class="badges" id="badges"></div>
+</div>
 
-const SCHOOLS_BASE = [
+<div class="tabs">
+  <div class="tab active" onclick="showTab('resumo')">📊 Resumo</div>
+  <div class="tab" onclick="showTab('comparar')">⚖️ Comparar</div>
+  <div class="tab" onclick="showTab('projecao')">📈 Projeção 5 Anos</div>
+  <div class="tab" onclick="showTab('proscontras')">✅ Prós & Contras</div>
+  <div class="tab" onclick="showTab('ajustes')">⚙️ Ajustes</div>
+</div>
+
+<div class="content">
+  <div id="page-resumo" class="page active"></div>
+  <div id="page-comparar" class="page"></div>
+  <div id="page-projecao" class="page"></div>
+  <div id="page-proscontras" class="page"></div>
+  <div id="page-ajustes" class="page"></div>
+
+  <div class="danger-box">
+    <div class="danger-title">🚨 Alertas Urgentes</div>
+    <div class="danger-item" style="color:#dc2626">🔴 <strong>Anglo 35%:</strong> Formalizar desconto por escrito — PRAZO 20/06/2026</div>
+    <div class="danger-item" style="color:#dc2626">🔴 <strong>Anglo geral:</strong> Reserva de vaga expira em 20/06/2026</div>
+    <div class="danger-item" style="color:#d97706">🟡 <strong>Red Balloon:</strong> 1ª parcela 15% desc. expira 30/06/2026 (economia R$232,62)</div>
+    <div style="font-size:.7rem;color:#9ca3af;margin-top:6px">Última atualização dos dados: 16/06/2026</div>
+  </div>
+</div>
+
+<script>
+// ── DADOS ──
+const ESCOLAS = [
   {
-    id: "anglo25",
-    nome: "Anglo Da Vinci",
-    modalidade: "25% desc.",
-    tag: "⚠️ Formalizar",
-    cor: "#6366f1",
-    corLight: "#eef2ff",
-    mensalidadeBruta: 6826.26,
-    descontoBase: 0.25,
-    descontoBaseLabel: "25% parceria",
-    temDescontoAnual: true,
-    descontoAnualCartao: 0.03,
-    descontoAnualBoleto: 0.05,
-    temDescontoSemestral: false,
-    temDescontoPontualidade: false,
-    natacaoExterna: true,
-    custoNatacao: 715,
-    futsal: true,
-    custoFutsal: 280,
-    materialAnual: 3850,
-    alimentacaoMensal: 0,
-    matricula: 900,
-    reajusteAnual: 0.125,
-    horarioEntrada: "7h20",
-    horarioSaida: "15h30",
-    horasDia: 8.17,
-    metodo: "Aprender a Estudar",
-    ingles: "Cambridge ✓",
-    distancia: "~15–25 min",
-    pros: [
-      "Melhor ranking ENEM (Top 5 SP)",
-      "Cambridge incluso na mensalidade",
-      "Horário estendido (8h10/dia)",
-      "Método estruturado de estudos",
-    ],
-    contras: [
-      "Maior reajuste histórico (10–15%/ano + degrau letivo)",
-      "Desconto revisável a qualquer momento",
-      "Alimentação a confirmar (risco de custo oculto)",
-      "Prazo urgente 20/06 ⚠️",
-      "Material R$3.850/ano (reajuste previsto)",
-    ],
-    alertas: ["🔴 Formalizar 35% por escrito", "🔴 Prazo: 20/06/2026"],
+    id:'anglo25', nome:'Anglo Da Vinci', mod:'25% desc.', tag:'⚠️ Formalizar', cor:'#6366f1',
+    bruto:6826.26, descBase:0.25, descAnualBol:0.05, descAnualCart:0.03, descSem:0, descPont:0,
+    natExt:true, natVal:715, futVal:280, matAnual:3850, alim:0, matricula:900, reaj:0.125, horas:8.17,
+    ingles:'Cambridge ✓', dist:'~15–25 min', metodo:'Aprender a Estudar', enem:'Top 5 SP',
+    pros:['Melhor ranking ENEM (Top 5 SP)','Cambridge incluso na mensalidade','Horário estendido (8h10/dia)','Método estruturado de estudos'],
+    contras:['Maior reajuste histórico (10–15%/ano + degrau letivo)','Desconto revisável a qualquer momento','Alimentação a confirmar','Prazo urgente 20/06 ⚠️','Material R$3.850/ano (reajuste previsto)'],
+    alertas:['🔴 Formalizar desconto por escrito','🔴 Prazo: 20/06/2026']
   },
   {
-    id: "anglo35",
-    nome: "Anglo Da Vinci",
-    modalidade: "35% desc. ⭐",
-    tag: "⚠️ Formalizar",
-    cor: "#6366f1",
-    corLight: "#eef2ff",
-    mensalidadeBruta: 6826.26,
-    descontoBase: 0.35,
-    descontoBaseLabel: "35% parceria ⭐",
-    temDescontoAnual: true,
-    descontoAnualCartao: 0.03,
-    descontoAnualBoleto: 0.05,
-    temDescontoSemestral: false,
-    temDescontoPontualidade: false,
-    natacaoExterna: true,
-    custoNatacao: 715,
-    futsal: true,
-    custoFutsal: 280,
-    materialAnual: 3850,
-    alimentacaoMensal: 0,
-    matricula: 900,
-    reajusteAnual: 0.125,
-    horarioEntrada: "7h20",
-    horarioSaida: "15h30",
-    horasDia: 8.17,
-    metodo: "Aprender a Estudar",
-    ingles: "Cambridge ✓",
-    distancia: "~15–25 min",
-    pros: [
-      "Maior desconto entre todas as opções",
-      "Cambridge incluso na mensalidade",
-      "Melhor ranking ENEM (Top 5 SP)",
-      "Melhor custo/hora entre todas",
-    ],
-    contras: [
-      "Desconto VERBAL — risco alto se não formalizado",
-      "Maior reajuste histórico (10–15%/ano + degrau)",
-      "Prazo urgentíssimo: 20/06/2026 ⚠️",
-      "Alimentação a confirmar",
-      "Desconto revisável a qualquer momento",
-    ],
-    alertas: ["🔴 URGENTE: formalizar por escrito", "🔴 Prazo: 20/06/2026"],
+    id:'anglo35', nome:'Anglo Da Vinci', mod:'35% desc. ⭐', tag:'⚠️ Formalizar', cor:'#6366f1',
+    bruto:6826.26, descBase:0.35, descAnualBol:0.05, descAnualCart:0.03, descSem:0, descPont:0,
+    natExt:true, natVal:715, futVal:280, matAnual:3850, alim:0, matricula:900, reaj:0.125, horas:8.17,
+    ingles:'Cambridge ✓', dist:'~15–25 min', metodo:'Aprender a Estudar', enem:'Top 5 SP',
+    pros:['Maior desconto entre todas as opções','Cambridge incluso na mensalidade','Melhor ranking ENEM (Top 5 SP)','Melhor custo/hora entre todas'],
+    contras:['Desconto VERBAL — risco alto se não formalizado','Maior reajuste histórico (10–15%/ano + degrau)','Prazo urgentíssimo: 20/06/2026 ⚠️','Alimentação a confirmar','Desconto revisável a qualquer momento'],
+    alertas:['🔴 URGENTE: formalizar por escrito até 20/06','🔴 Prazo: 20/06/2026']
   },
   {
-    id: "maple_manha",
-    nome: "Maple Bear",
-    modalidade: "Só Manhã",
-    tag: "",
-    cor: "#d97706",
-    corLight: "#fffbeb",
-    mensalidadeBruta: 5989.10,
-    descontoBase: 0.10,
-    descontoBaseLabel: "10% irmandade",
-    temDescontoAnual: true,
-    descontoAnualBruto: 0.11,
-    temDescontoSemestral: true,
-    descontoSemestralBruto: 0.07,
-    temDescontoPontualidade: true,
-    descontoPontualidade: 0.05,
-    natacaoExterna: true,
-    custoNatacao: 715,
-    futsal: true,
-    custoFutsal: 280,
-    materialAnual: 4065,
-    alimentacaoMensal: 0,
-    matricula: 0,
-    reajusteAnual: 0.09,
-    horarioEntrada: "7h30",
-    horarioSaida: "12h50",
-    horasDia: 5.33,
-    metodo: "Método canadense",
-    ingles: "Bilíngue canadense ✓",
-    distancia: "~10–15 min",
-    pros: [
-      "Melhor política de descontos (11%+10% cumulativos)",
-      "Reajuste mais previsível (~9%/ano)",
-      "Bilíngue canadense integrado",
-      "Sem taxa de matrícula",
-    ],
-    contras: [
-      "Horário curto (5h20/dia)",
-      "Material SLM+ R$4.065/ano obrigatório + livros",
-      "Sem alimentação inclusa",
-    ],
-    alertas: [],
+    id:'maple_m', nome:'Maple Bear', mod:'Só Manhã', tag:'', cor:'#d97706',
+    bruto:5989.10, descBase:0.10, descAnualBruto:0.11, descSemBruto:0.07, descPont:0.05,
+    natExt:true, natVal:715, futVal:280, matAnual:4065, alim:0, matricula:0, reaj:0.09, horas:5.33,
+    ingles:'Bilíngue canadense ✓', dist:'~10–15 min', metodo:'Método canadense', enem:'Rede global canadense',
+    pros:['Melhor política de descontos (11%+10% cumulativos)','Reajuste mais previsível (~9%/ano)','Bilíngue canadense integrado','Sem taxa de matrícula'],
+    contras:['Horário curto (5h20/dia)','Material SLM+ R$4.065/ano obrigatório + livros','Sem alimentação inclusa'],
+    alertas:[]
   },
   {
-    id: "maple_ba",
-    nome: "Maple Bear",
-    modalidade: "Manhã + B&A",
-    tag: "",
-    cor: "#d97706",
-    corLight: "#fffbeb",
-    mensalidadeBruta: 8838.10,
-    descontoBase: 0.10,
-    descontoBaseLabel: "10% irmandade",
-    temDescontoAnual: true,
-    descontoAnualBruto: 0.11,
-    temDescontoSemestral: true,
-    descontoSemestralBruto: 0.07,
-    temDescontoPontualidade: true,
-    descontoPontualidade: 0.05,
-    natacaoExterna: true,
-    custoNatacao: 715,
-    futsal: true,
-    custoFutsal: 280,
-    materialAnual: 4065,
-    alimentacaoMensal: 600,
-    matricula: 0,
-    reajusteAnual: 0.09,
-    horarioEntrada: "7h30",
-    horarioSaida: "17h30",
-    horasDia: 10.0,
-    metodo: "Método canadense",
-    ingles: "Bilíngue canadense ✓",
-    distancia: "~10–15 min",
-    pros: [
-      "Maior carga horária (10h/dia)",
-      "Bilíngue canadense integrado",
-      "Almoço e lanche inclusos",
-      "Melhor política de descontos",
-    ],
-    contras: [
-      "Opção mais cara entre todas",
-      "Material SLM+ R$4.065/ano + livros",
-    ],
-    alertas: [],
+    id:'maple_ba', nome:'Maple Bear', mod:'Manhã + B&A', tag:'', cor:'#d97706',
+    bruto:8838.10, descBase:0.10, descAnualBruto:0.11, descSemBruto:0.07, descPont:0.05,
+    natExt:true, natVal:715, futVal:280, matAnual:4065, alim:600, matricula:0, reaj:0.09, horas:10.0,
+    ingles:'Bilíngue canadense ✓', dist:'~10–15 min', metodo:'Método canadense', enem:'Rede global canadense',
+    pros:['Maior carga horária (10h/dia)','Bilíngue canadense integrado','Almoço e lanche inclusos','Melhor política de descontos'],
+    contras:['Opção mais cara entre todas','Material SLM+ R$4.065/ano + livros'],
+    alertas:[]
   },
   {
-    id: "penta_reg",
-    nome: "Pentágono",
-    modalidade: "Regular",
-    tag: "15% Gênesis 2",
-    cor: "#059669",
-    corLight: "#ecfdf5",
-    mensalidadeBruta: 4955.51,
-    descontoBase: 0.15,
-    descontoBaseLabel: "15% Gênesis 2",
-    temDescontoAnual: true,
-    descontoAnualLiquido: 0.05,
-    temDescontoSemestral: true,
-    descontoSemestralLiquido: 0.025,
-    temDescontoPontualidade: false,
-    natacaoExterna: true,
-    custoNatacao: 715,
-    futsal: true,
-    custoFutsal: 280,
-    materialAnual: 0,
-    alimentacaoMensal: 0,
-    matricula: 0,
-    reajusteAnual: 0.087,
-    horarioEntrada: "7h30",
-    horarioSaida: "12h30",
-    horasDia: 5.0,
-    metodo: "Educação Humanista",
-    ingles: "Via Red Balloon",
-    distancia: "~5–10 min 🏆",
-    pros: [
-      "Mensalidade mais baixa 🥇",
-      "Menor reajuste histórico (~8,7%/ano)",
-      "Mais perto do Gênesis 2 🏆",
-      "Sem taxa de matrícula",
-      "1º lugar em Santana de Parnaíba",
-    ],
-    contras: [
-      "Horário mais curto (5h/dia)",
-      "Alimentação não inclusa",
-      "Inglês não integrado (depende Red Balloon)",
-    ],
-    alertas: ["Vaga abre agosto/2026"],
+    id:'penta_r', nome:'Pentágono', mod:'Regular', tag:'15% Gênesis 2', cor:'#059669',
+    bruto:4955.51, descBase:0.15, descAnualLiq:0.05, descSemLiq:0.025, descPont:0,
+    natExt:true, natVal:715, futVal:280, matAnual:0, alim:0, matricula:0, reaj:0.087, horas:5.0,
+    ingles:'Via Red Balloon', dist:'~5–10 min 🏆', metodo:'Educação Humanista', enem:'1º Santana de Parnaíba',
+    pros:['Mensalidade mais baixa 🥇','Menor reajuste histórico (~8,7%/ano)','Mais perto do Gênesis 2 🏆','Sem taxa de matrícula','1º lugar em Santana de Parnaíba'],
+    contras:['Horário mais curto (5h/dia)','Alimentação não inclusa','Inglês não integrado (depende Red Balloon)'],
+    alertas:['Vaga abre agosto/2026']
   },
   {
-    id: "penta_semi3",
-    nome: "Pentágono",
-    modalidade: "Semi Int. 3x",
-    tag: "",
-    cor: "#059669",
-    corLight: "#ecfdf5",
-    mensalidadeBruta: 6702.76,
-    descontoBase: 0,
-    descontoBaseLabel: "Sem desconto Gênesis 2",
-    temDescontoAnual: true,
-    descontoAnualLiquido: 0.05,
-    temDescontoSemestral: true,
-    descontoSemestralLiquido: 0.025,
-    temDescontoPontualidade: false,
-    natacaoExterna: true,
-    custoNatacao: 715,
-    futsal: true,
-    custoFutsal: 280,
-    materialAnual: 0,
-    alimentacaoMensal: 520,
-    matricula: 0,
-    reajusteAnual: 0.087,
-    horarioEntrada: "7h30",
-    horarioSaida: "15h30",
-    horasDia: 6.33,
-    metodo: "Educação Humanista",
-    ingles: "Learn&Play + Cambridge ✓",
-    distancia: "~5–10 min 🏆",
-    pros: [
-      "Inglês Learn&Play+Cambridge incluso",
-      "Mais perto do Gênesis 2 🏆",
-      "Horário estendido 3x/semana",
-    ],
-    contras: [
-      "Sem desconto Gênesis 2 nessa modalidade",
-      "Alimentação ~R$520/mês extra",
-      "Horário irregular (3x estendido, 2x curto)",
-    ],
-    alertas: [],
+    id:'penta_3', nome:'Pentágono', mod:'Semi Int. 3x', tag:'', cor:'#059669',
+    bruto:6702.76, descBase:0, descAnualLiq:0.05, descSemLiq:0.025, descPont:0,
+    natExt:true, natVal:715, futVal:280, matAnual:0, alim:520, matricula:0, reaj:0.087, horas:6.33,
+    ingles:'Learn&Play + Cambridge ✓', dist:'~5–10 min 🏆', metodo:'Educação Humanista', enem:'1º Santana de Parnaíba',
+    pros:['Inglês Learn&Play+Cambridge incluso','Mais perto do Gênesis 2 🏆','Horário estendido 3x/semana'],
+    contras:['Sem desconto Gênesis 2 nessa modalidade','Alimentação ~R$520/mês extra','Horário irregular (3x estendido, 2x curto)'],
+    alertas:[]
   },
   {
-    id: "penta_semi5",
-    nome: "Pentágono",
-    modalidade: "Semi Int. 5x",
-    tag: "🏊 Natação inclusa",
-    cor: "#059669",
-    corLight: "#ecfdf5",
-    mensalidadeBruta: 6972.15,
-    descontoBase: 0,
-    descontoBaseLabel: "Sem desconto Gênesis 2",
-    temDescontoAnual: true,
-    descontoAnualLiquido: 0.05,
-    temDescontoSemestral: true,
-    descontoSemestralLiquido: 0.025,
-    temDescontoPontualidade: false,
-    natacaoExterna: false,
-    custoNatacao: 0,
-    futsal: true,
-    custoFutsal: 280,
-    materialAnual: 0,
-    alimentacaoMensal: 520,
-    matricula: 0,
-    reajusteAnual: 0.087,
-    horarioEntrada: "7h30",
-    horarioSaida: "15h30",
-    horasDia: 8.0,
-    metodo: "Educação Humanista",
-    ingles: "Learn&Play + Cambridge ✓",
-    distancia: "~5–10 min 🏆",
-    pros: [
-      "Natação inclusa (economia R$715/mês) 🏊",
-      "Inglês Learn&Play+Cambridge incluso",
-      "Horário estendido todos os dias (8h/dia)",
-      "Mais perto do Gênesis 2 🏆",
-    ],
-    contras: [
-      "Sem desconto Gênesis 2 nessa modalidade",
-      "Alimentação ~R$520/mês extra",
-    ],
-    alertas: [],
+    id:'penta_5', nome:'Pentágono', mod:'Semi Int. 5x', tag:'🏊 Natação inclusa', cor:'#059669',
+    bruto:6972.15, descBase:0, descAnualLiq:0.05, descSemLiq:0.025, descPont:0,
+    natExt:false, natVal:0, futVal:280, matAnual:0, alim:520, matricula:0, reaj:0.087, horas:8.0,
+    ingles:'Learn&Play + Cambridge ✓', dist:'~5–10 min 🏆', metodo:'Educação Humanista', enem:'1º Santana de Parnaíba',
+    pros:['Natação inclusa (economia R$715/mês) 🏊','Inglês Learn&Play+Cambridge incluso','Horário estendido todos os dias (8h/dia)','Mais perto do Gênesis 2 🏆'],
+    contras:['Sem desconto Gênesis 2 nessa modalidade','Alimentação ~R$520/mês extra'],
+    alertas:[]
   },
   {
-    id: "penta_semi5nat",
-    nome: "Pentágono",
-    modalidade: "Semi 5x+Nat.",
-    tag: "🏊 Nat. extra",
-    cor: "#059669",
-    corLight: "#ecfdf5",
-    mensalidadeBruta: 6972.15,
-    descontoBase: 0,
-    descontoBaseLabel: "Sem desconto Gênesis 2",
-    temDescontoAnual: true,
-    descontoAnualLiquido: 0.05,
-    temDescontoSemestral: true,
-    descontoSemestralLiquido: 0.025,
-    temDescontoPontualidade: false,
-    natacaoExterna: false,
-    custoNatacao: 507,
-    futsal: true,
-    custoFutsal: 280,
-    materialAnual: 0,
-    alimentacaoMensal: 520,
-    matricula: 0,
-    reajusteAnual: 0.087,
-    horarioEntrada: "7h30",
-    horarioSaida: "15h30",
-    horasDia: 8.0,
-    metodo: "Educação Humanista",
-    ingles: "Learn&Play + Cambridge ✓",
-    distancia: "~5–10 min 🏆",
-    pros: [
-      "Natação inclusa (1x) + avulsa extra",
-      "Inglês Learn&Play+Cambridge incluso",
-      "Horário estendido (8h/dia)",
-    ],
-    contras: [
-      "Opção mais cara do Pentágono no total",
-      "Sem desconto Gênesis 2",
-      "Alimentação ~R$520/mês extra",
-    ],
-    alertas: [],
-  },
+    id:'penta_5n', nome:'Pentágono', mod:'Semi 5x+Nat.', tag:'🏊 Nat. extra', cor:'#059669',
+    bruto:6972.15, descBase:0, descAnualLiq:0.05, descSemLiq:0.025, descPont:0,
+    natExt:false, natVal:507, futVal:280, matAnual:0, alim:520, matricula:0, reaj:0.087, horas:8.0,
+    ingles:'Learn&Play + Cambridge ✓', dist:'~5–10 min 🏆', metodo:'Educação Humanista', enem:'1º Santana de Parnaíba',
+    pros:['Natação inclusa (1x) + avulsa extra','Inglês Learn&Play+Cambridge incluso','Horário estendido (8h/dia)'],
+    contras:['Opção mais cara do Pentágono no total','Sem desconto Gênesis 2','Alimentação ~R$520/mês extra'],
+    alertas:[]
+  }
 ];
 
-const RED_BALLOON = 1550.77;
+// ── ESTADO ──
+let estado = {
+  modo: 'anual',
+  angloFmt: 'boleto',
+  pontualidade: true,
+  natacao: true, futsal: true, redballoon: true, alimentacao: true, material: true,
+  custoNat: 715, custoFut: 280, custoRB: 1550.77,
+  selecionadas: new Set(['anglo35','maple_m','penta_r','penta_5'])
+};
 
-function calcMensalidade(school, ajustes) {
-  const bruto = school.mensalidadeBruta;
-  const descBase = school.descontoBase || 0;
-  const liquido = bruto * (1 - descBase);
-  let final = liquido;
-  const modoDesconto = ajustes.modoDesconto || "base";
+// ── FUNÇÕES ──
+function fmtBRL(v) {
+  return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+}
 
-  if (modoDesconto === "semestral") {
-    if (school.id.startsWith("maple") && school.temDescontoSemestral) {
-      final = bruto * (1 - descBase) * (1 - school.descontoSemestralBruto);
-    } else if (school.id.startsWith("penta") && school.temDescontoSemestral) {
-      final = liquido * (1 - school.descontoSemestralLiquido);
-    }
-  } else if (modoDesconto === "anual") {
-    if (school.id.startsWith("maple") && school.temDescontoAnual) {
-      final = bruto * (1 - descBase) * (1 - school.descontoAnualBruto);
-    } else if (school.id.startsWith("penta") && school.temDescontoAnual) {
-      final = liquido * (1 - school.descontoAnualLiquido);
-    } else if (school.id.startsWith("anglo") && school.temDescontoAnual) {
-      const extDesc = ajustes.angloFormaPgto === "cartao"
-        ? school.descontoAnualCartao
-        : school.descontoAnualBoleto;
-      final = liquido * (1 - extDesc);
-    }
+function calcEscola(e) {
+  const liq = e.bruto * (1 - (e.descBase||0));
+  let val = liq;
+  if (estado.modo === 'anual') {
+    if (e.id.startsWith('maple') && e.descAnualBruto) val = e.bruto*(1-e.descBase)*(1-e.descAnualBruto);
+    else if (e.id.startsWith('penta') && e.descAnualLiq) val = liq*(1-e.descAnualLiq);
+    else if (e.id.startsWith('anglo')) val = liq*(1-(estado.angloFmt==='boleto'?e.descAnualBol:e.descAnualCart));
+  } else if (estado.modo === 'semestral') {
+    if (e.id.startsWith('maple') && e.descSemBruto) val = e.bruto*(1-e.descBase)*(1-e.descSemBruto);
+    else if (e.id.startsWith('penta') && e.descSemLiq) val = liq*(1-e.descSemLiq);
   }
-
-  if (modoDesconto !== "base" && school.temDescontoPontualidade && ajustes.pontualidade) {
-    if (school.id.startsWith("maple")) {
-      final = final * (1 - school.descontoPontualidade);
-    }
-  }
-
-  return final;
+  if (estado.modo !== 'base' && estado.pontualidade && e.descPont && e.id.startsWith('maple'))
+    val = val*(1-e.descPont);
+  return val;
 }
 
-function calcTotal(school, ajustes, configs) {
-  const mensEscola = calcMensalidade(school, ajustes);
-  const natacao = configs.incluirNatacao
-    ? (school.natacaoExterna ? configs.custoNatacao : school.custoNatacao)
-    : 0;
-  const futsal = configs.incluirFutsal ? configs.custoFutsal : 0;
-  const rb = configs.incluirRedBalloon ? configs.custoRedBalloon : 0;
-  const alim = configs.incluirAlimentacao ? school.alimentacaoMensal : 0;
-  const mat = configs.incluirMaterial ? (school.materialAnual / 12) : 0;
-  return { escola: mensEscola, natacao, futsal, redBalloon: rb, alimentacao: alim, material: mat,
-    total: mensEscola + natacao + futsal + rb + alim + mat };
+function calcTotal(e) {
+  const escola = calcEscola(e);
+  const nat = estado.natacao ? (e.natExt ? estado.custoNat : e.natVal) : 0;
+  const fut = estado.futsal ? estado.custoFut : 0;
+  const rb  = estado.redballoon ? estado.custoRB : 0;
+  const alm = estado.alimentacao ? e.alim : 0;
+  const mat = estado.material ? e.matAnual/12 : 0;
+  return {escola, nat, fut, rb, alm, mat, total: escola+nat+fut+rb+alm+mat};
 }
 
-function fmt(v) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+function calcProj(e) {
+  const base = calcTotal(e).total;
+  let tot = 0; const anos = [];
+  for(let i=0;i<5;i++){const v=base*Math.pow(1+e.reaj,i);tot+=v*13;anos.push(v);}
+  return {anos, tot};
 }
 
-function projecao5Anos(school, ajustes, configs) {
-  const base = calcTotal(school, ajustes, configs).total;
-  const reaj = school.reajusteAnual;
-  let total = 0;
-  const anos = [];
-  for (let i = 0; i < 5; i++) {
-    const val = base * Math.pow(1 + reaj, i);
-    total += val * 13;
-    anos.push(val);
-  }
-  return { anos, total };
+function getRanked() {
+  return [...ESCOLAS].map(e=>({e,t:calcTotal(e).total})).sort((a,b)=>a.t-b.t).map((x,i)=>({...x,rank:i+1}));
 }
 
-function Badge({ text, color }) {
-  return (
-    <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: color + "22", color }}>
-      {text}
-    </span>
-  );
+function rankClass(r) {
+  if(r===1) return 'rank1';
+  if(r<=3) return 'rank2';
+  if(r<=5) return 'rank4';
+  return 'rank6';
 }
 
-function SchoolCard({ school, breakdown, rank, isSelected, onToggle }) {
-  const rankColors = ["best", "good", "good", "warn", "warn", "", "", "bad"];
-  const cl = rankColors[rank - 1] || "";
-  return (
-    <div
-      className={`card p-4 cursor-pointer school-toggle border-2 ${isSelected ? "border-indigo-500" : "border-transparent"}`}
-      onClick={onToggle}
-    >
-      <div className="flex justify-between items-start mb-2">
-        <div>
-          <div className="font-bold text-sm" style={{ color: school.cor }}>{school.nome}</div>
-          <div className="text-xs text-gray-500">{school.modalidade}</div>
-          {school.tag && <div className="text-xs mt-1 text-orange-600 font-medium">{school.tag}</div>}
-        </div>
-        <div className="text-right">
-          <div className={`text-xs font-bold px-2 py-1 rounded-full ${cl}`}>#{rank}</div>
-          <div className="mt-1">
-            <input type="checkbox" checked={isSelected} onChange={onToggle} className="w-4 h-4 accent-indigo-600" onClick={e => e.stopPropagation()} />
-          </div>
-        </div>
-      </div>
-      <div className="text-xl font-black mt-2" style={{ color: school.cor }}>{fmt(breakdown.total)}</div>
-      <div className="text-xs text-gray-400">/mês total</div>
-      <div className="text-xs mt-2 text-gray-500">Escola: {fmt(breakdown.escola)}</div>
-      {school.alertas.length > 0 && (
-        <div className="mt-2 text-xs text-red-600 bg-red-50 rounded p-1">{school.alertas[0]}</div>
-      )}
-    </div>
-  );
+function toggleSchool(id) {
+  if(estado.selecionadas.has(id)) estado.selecionadas.delete(id);
+  else estado.selecionadas.add(id);
+  render();
 }
 
-function CompareTable({ schools, breakdowns, ajustes, configs }) {
-  const rows = [
-    { label: "Mensalidade escola", key: "escola" },
-    { label: "Natação", key: "natacao" },
-    { label: "Futsal", key: "futsal" },
-    { label: "Red Balloon", key: "redBalloon" },
-    { label: "Alimentação", key: "alimentacao" },
-    { label: "Material (÷12)", key: "material" },
-    { label: "TOTAL MENSAL", key: "total", bold: true },
+function getSel() { return ESCOLAS.filter(e=>estado.selecionadas.has(e.id)); }
+
+// ── RENDER ──
+function renderBadges() {
+  const modos = {base:'Desc. base',semestral:'Pagamento semestral',anual:'Pagamento anual'};
+  const items = [
+    {t:`Modo: ${modos[estado.modo]}`,c:'#4f46e5'},
+    ...(estado.natacao?[{t:'🏊 Natação',c:'#0891b2'}]:[]),
+    ...(estado.futsal?[{t:'⚽ Futsal',c:'#16a34a'}]:[]),
+    ...(estado.redballoon?[{t:'🔵 Red Balloon',c:'#2563eb'}]:[]),
+    ...(estado.alimentacao?[{t:'🍽️ Alimentação',c:'#d97706'}]:[]),
+    ...(estado.material?[{t:'📚 Material',c:'#7c3aed'}]:[]),
   ];
-  const projecoes = schools.map(s => projecao5Anos(s, ajustes, configs));
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b-2">
-            <th className="text-left py-2 pr-4 text-gray-500 font-medium w-40">Item</th>
-            {schools.map(s => (
-              <th key={s.id} className="text-center py-2 px-2 font-bold" style={{ color: s.cor }}>
-                <div>{s.nome}</div>
-                <div className="text-xs font-normal text-gray-500">{s.modalidade}</div>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(row => {
-            const vals = breakdowns.map(b => b[row.key]);
-            const minVal = Math.min(...vals.filter(v => v > 0));
-            return (
-              <tr key={row.label} className={`border-b ${row.bold ? "bg-indigo-50" : ""}`}>
-                <td className={`py-2 pr-4 ${row.bold ? "font-bold text-indigo-900" : "text-gray-600"}`}>{row.label}</td>
-                {vals.map((v, i) => (
-                  <td key={i} className={`text-center py-2 px-2 ${row.bold ? "font-black text-base" : ""}`}
-                    style={row.bold && v === minVal ? { color: "#059669" } : {}}>
-                    {v === 0 ? <span className="text-gray-300">—</span> : fmt(v)}
-                    {row.bold && v === minVal && <div className="text-xs text-green-600">🏆 menor</div>}
-                  </td>
-                ))}
-              </tr>
-            );
-          })}
-          <tr className="border-b-2 border-gray-300 bg-yellow-50">
-            <td className="py-2 pr-4 font-bold text-yellow-800">Total 5 anos</td>
-            {projecoes.map((p, i) => {
-              const minTotal = Math.min(...projecoes.map(x => x.total));
-              return (
-                <td key={i} className={`text-center py-2 px-2 font-bold ${p.total === minTotal ? "text-green-700" : "text-gray-700"}`}>
-                  {fmt(p.total)}
-                  {p.total === minTotal && <div className="text-xs text-green-600">🏆</div>}
-                </td>
-              );
-            })}
-          </tr>
-          <tr><td className="py-1 pr-4 text-xs text-gray-400">Reajuste/ano</td>
-            {schools.map(s => <td key={s.id} className="text-center py-1 px-2 text-xs text-gray-400">{(s.reajusteAnual*100).toFixed(1)}%</td>)}
-          </tr>
-          <tr><td className="py-1 pr-4 text-xs text-gray-400">Horas/dia</td>
-            {schools.map(s => <td key={s.id} className="text-center py-1 px-2 text-xs text-gray-400">{s.horasDia}h</td>)}
-          </tr>
-          <tr><td className="py-1 pr-4 text-xs text-gray-400">Distância</td>
-            {schools.map(s => <td key={s.id} className="text-center py-1 px-2 text-xs text-gray-400">{s.distancia}</td>)}
-          </tr>
-          <tr><td className="py-1 pr-4 text-xs text-gray-400">Inglês</td>
-            {schools.map(s => <td key={s.id} className="text-center py-1 px-2 text-xs text-gray-400">{s.ingles}</td>)}
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
+  document.getElementById('badges').innerHTML = items.map(b=>
+    `<span class="badge" style="background:${b.c}22;color:${b.c}">${b.t}</span>`
+  ).join('');
 }
 
-function ProsContras({ schools }) {
-  return (
-    <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${Math.min(schools.length, 2)}, 1fr)` }}>
-      {schools.map(s => (
-        <div key={s.id} className="card p-4 border-l-4" style={{ borderColor: s.cor }}>
-          <div className="font-bold mb-1" style={{ color: s.cor }}>{s.nome}</div>
-          <div className="text-sm text-gray-500 mb-3">{s.modalidade}</div>
-          <div className="mb-3">
-            <div className="text-xs font-bold text-green-700 mb-1">✅ PRÓS</div>
-            {s.pros.map((p, i) => (
-              <div key={i} className="text-xs text-gray-700 mb-1 flex gap-1">
-                <span className="text-green-500 mt-0.5">•</span><span>{p}</span>
-              </div>
-            ))}
-          </div>
-          <div>
-            <div className="text-xs font-bold text-red-600 mb-1">❌ CONTRAS</div>
-            {s.contras.map((c, i) => (
-              <div key={i} className="text-xs text-gray-700 mb-1 flex gap-1">
-                <span className="text-red-400 mt-0.5">•</span><span>{c}</span>
-              </div>
-            ))}
-          </div>
-          {s.alertas.length > 0 && (
-            <div className="mt-3 bg-red-50 rounded p-2">
-              <div className="text-xs font-bold text-red-600 mb-1">⚠️ ALERTAS</div>
-              {s.alertas.map((a, i) => <div key={i} className="text-xs text-red-700">{a}</div>)}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function Projecao5Anos({ schools, ajustes, configs }) {
-  const ANOS = [2027, 2028, 2029, 2030, 2031];
-  const projecoes = schools.map(s => ({ school: s, dados: projecao5Anos(s, ajustes, configs) }));
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b-2">
-            <th className="text-left py-2 pr-4 text-gray-500 font-medium">Ano</th>
-            {schools.map(s => (
-              <th key={s.id} className="text-center py-2 px-2 font-bold" style={{ color: s.cor }}>
-                <div className="text-xs">{s.nome}</div>
-                <div className="text-xs font-normal">{s.modalidade}</div>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {ANOS.map((ano, i) => {
-            const vals = projecoes.map(p => p.dados.anos[i]);
-            const min = Math.min(...vals);
-            return (
-              <tr key={ano} className="border-b">
-                <td className="py-2 pr-4 font-semibold text-gray-700">{ano}</td>
-                {vals.map((v, j) => (
-                  <td key={j} className={`text-center py-2 px-2 ${v === min ? "text-green-700 font-bold" : ""}`}>
-                    {fmt(v)}{v === min && <span className="ml-1 text-green-500">🏆</span>}
-                  </td>
-                ))}
-              </tr>
-            );
-          })}
-          <tr className="bg-indigo-50 font-black">
-            <td className="py-2 pr-4 text-indigo-900">TOTAL 5 ANOS</td>
-            {projecoes.map((p, i) => {
-              const min = Math.min(...projecoes.map(x => x.dados.total));
-              return (
-                <td key={i} className={`text-center py-2 px-2 text-sm ${p.dados.total === min ? "text-green-700" : "text-gray-700"}`}>
-                  {fmt(p.dados.total)}
-                  {p.dados.total === min && <div className="text-xs text-green-500">🏆 menor</div>}
-                </td>
-              );
-            })}
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function App() {
-  const [tab, setTab] = useState("resumo");
-  const [ajustes, setAjustes] = useState({ modoDesconto: "anual", angloFormaPgto: "boleto", pontualidade: true });
-  const [configs, setConfigs] = useState({
-    incluirNatacao: true, incluirFutsal: true, incluirRedBalloon: true,
-    incluirAlimentacao: true, incluirMaterial: true,
-    custoNatacao: 715, custoFutsal: 280, custoRedBalloon: RED_BALLOON,
+function renderResumo() {
+  const ranked = getRanked();
+  let cards = '<div class="grid4">';
+  ranked.forEach(({e,t,rank})=>{
+    const bd = calcTotal(e);
+    const sel = estado.selecionadas.has(e.id);
+    cards += `
+    <div class="school-card ${sel?'selected':''}" onclick="toggleSchool('${e.id}')">
+      <span class="${rankClass(rank)} rank-badge">#${rank}</span>
+      <div class="school-name" style="color:${e.cor}">${e.nome}</div>
+      <div class="school-mod">${e.mod}</div>
+      ${e.tag?`<div class="school-tag">${e.tag}</div>`:''}
+      <div class="school-total" style="color:${e.cor}">${fmtBRL(bd.total)}</div>
+      <div class="school-sub">/mês total</div>
+      <div style="font-size:.72rem;color:#9ca3af;margin-top:4px">Escola: ${fmtBRL(bd.escola)}</div>
+      ${e.alertas.length?`<div class="school-alert">${e.alertas[0]}</div>`:''}
+    </div>`;
   });
-  const [selecionadas, setSelecionadas] = useState(["anglo35", "maple_manha", "penta_reg", "penta_semi5"]);
+  cards += '</div>';
 
-  const toggleSchool = useCallback((id) => {
-    setSelecionadas(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  }, []);
+  // análise automática
+  const top = ranked.slice(0,3);
+  const topProj = [...ESCOLAS].map(e=>({e,t:calcProj(e).tot})).sort((a,b)=>a.t-b.t)[0];
+  const modoLabel = {base:'desconto base',semestral:'semestral',anual:'anual'}[estado.modo];
+  const analise = `
+  <div class="analysis-box">
+    <div class="analysis-title">🤖 Análise Automática — Modo: ${modoLabel}</div>
+    <div class="analysis-row">🥇 <strong>Menor custo mensal:</strong> ${top[0].e.nome} ${top[0].e.mod} — ${fmtBRL(top[0].t)}/mês</div>
+    <div class="analysis-row">🥈 <strong>2º lugar:</strong> ${top[1].e.nome} ${top[1].e.mod} — ${fmtBRL(top[1].t)}/mês</div>
+    <div class="analysis-row">🥉 <strong>3º lugar:</strong> ${top[2].e.nome} ${top[2].e.mod} — ${fmtBRL(top[2].t)}/mês</div>
+    <div class="analysis-row">📈 <strong>Menor custo 5 anos:</strong> ${topProj.e.nome} ${topProj.e.mod} — ${fmtBRL(topProj.t)}</div>
+    <div class="analysis-note">💡 Pentágono Regular tem a <strong>menor mensalidade</strong>. Anglo 35% tem o <strong>melhor custo/hora</strong> e <strong>Top 5 ENEM SP</strong>, mas precisa ser formalizado por escrito até 20/06. Ajuste os itens na aba ⚙️ Ajustes para personalizar a comparação.</div>
+  </div>`;
 
-  const allBreakdowns = useMemo(() => SCHOOLS_BASE.map(s => calcTotal(s, ajustes, configs)), [ajustes, configs]);
-
-  const ranked = useMemo(() => {
-    const sorted = [...SCHOOLS_BASE].map((s, i) => ({ s, total: allBreakdowns[i].total })).sort((a, b) => a.total - b.total);
-    const rankMap = {};
-    sorted.forEach((item, i) => { rankMap[item.s.id] = i + 1; });
-    return rankMap;
-  }, [allBreakdowns]);
-
-  const selectedSchools = SCHOOLS_BASE.filter(s => selecionadas.includes(s.id));
-  const selectedBreakdowns = selectedSchools.map(s => calcTotal(s, ajustes, configs));
-
-  const TABS = [
-    { id: "resumo", label: "📊 Resumo" },
-    { id: "compare", label: "⚖️ Comparar" },
-    { id: "projecao", label: "📈 Projeção 5 Anos" },
-    { id: "proscontras", label: "✅ Prós & Contras" },
-    { id: "ajustes", label: "⚙️ Ajustes" },
-  ];
-
-  return (
-    <div className="min-h-screen p-4 md:p-6">
-      <div className="card p-5 mb-6">
-        <h1 className="text-xl md:text-2xl font-black text-gray-800">🏫 Comparativo de Escolas — Gustavo</h1>
-        <p className="text-sm text-gray-500 mt-1">1º Ano Fundamental · Gênesis 2, Alphaville · 2026/2027</p>
-        <div className="flex flex-wrap gap-2 mt-3">
-          <Badge text={`Modo: ${ajustes.modoDesconto === "base" ? "Desc. base" : ajustes.modoDesconto === "anual" ? "Pagamento anual" : "Pagamento semestral"}`} color="#4f46e5" />
-          {configs.incluirNatacao && <Badge text="🏊 Natação" color="#0891b2" />}
-          {configs.incluirFutsal && <Badge text="⚽ Futsal" color="#16a34a" />}
-          {configs.incluirRedBalloon && <Badge text="🔵 Red Balloon" color="#2563eb" />}
-          {configs.incluirAlimentacao && <Badge text="🍽️ Alimentação" color="#d97706" />}
-          {configs.incluirMaterial && <Badge text="📚 Material" color="#7c3aed" />}
-        </div>
-      </div>
-
-      <div className="card mb-6">
-        <div className="flex overflow-x-auto border-b">
-          {TABS.map(t => (
-            <div key={t.id} className={`tab whitespace-nowrap ${tab === t.id ? "tab-active" : ""}`} onClick={() => setTab(t.id)}>
-              {t.label}
-            </div>
-          ))}
-        </div>
-        <div className="p-4">
-
-          {tab === "resumo" && (
-            <div>
-              <p className="text-sm text-gray-500 mb-4">Clique nos cards para incluir/excluir da comparação detalhada.</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                {SCHOOLS_BASE.map((s, i) => (
-                  <SchoolCard key={s.id} school={s} breakdown={allBreakdowns[i]} rank={ranked[s.id]}
-                    isSelected={selecionadas.includes(s.id)} onToggle={() => toggleSchool(s.id)} />
-                ))}
-              </div>
-              <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
-                <div className="font-bold text-indigo-800 mb-2">🤖 Análise Automática</div>
-                {(() => {
-                  const sorted = [...SCHOOLS_BASE].map((s, i) => ({ s, total: allBreakdowns[i].total })).sort((a, b) => a.total - b.total);
-                  const top3 = sorted.slice(0, 3);
-                  const topProj = [...SCHOOLS_BASE].map(s => ({ s, total: projecao5Anos(s, ajustes, configs).total })).sort((a, b) => a.total - b.total)[0];
-                  return (
-                    <div className="text-sm text-indigo-900 space-y-2">
-                      <p>🥇 <strong>Menor custo mensal:</strong> {top3[0].s.nome} {top3[0].s.modalidade} — {fmt(top3[0].total)}/mês</p>
-                      <p>🥈 <strong>2º lugar:</strong> {top3[1].s.nome} {top3[1].s.modalidade} — {fmt(top3[1].total)}/mês</p>
-                      <p>🥉 <strong>3º lugar:</strong> {top3[2].s.nome} {top3[2].s.modalidade} — {fmt(top3[2].total)}/mês</p>
-                      <p>📈 <strong>Menor custo 5 anos:</strong> {topProj.s.nome} {topProj.s.modalidade} — {fmt(topProj.total)}</p>
-                      <div className="mt-2 p-2 bg-white rounded-lg text-xs text-gray-600">
-                        💡 O ranking atualiza em tempo real conforme você muda os ajustes. O Pentágono Regular tem a <strong>menor mensalidade</strong>, mas o Anglo 35% oferece <strong>melhor custo/hora</strong> e <strong>Top 5 ENEM SP</strong>. Atenção: Anglo 35% precisa ser <strong>formalizado por escrito até 20/06</strong>.
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
-          )}
-
-          {tab === "compare" && (
-            selectedSchools.length === 0
-              ? <p className="text-gray-400 text-center py-8">Selecione pelo menos 1 escola no Resumo</p>
-              : <CompareTable schools={selectedSchools} breakdowns={selectedBreakdowns} ajustes={ajustes} configs={configs} />
-          )}
-
-          {tab === "projecao" && (
-            <div>
-              <div className="text-xs text-gray-500 mb-4 bg-yellow-50 p-3 rounded-lg">
-                ⚠️ Projeção usa reajuste histórico de cada escola (Anglo 12,5%/ano · Maple 9%/ano · Pentágono 8,7%/ano). 13 parcelas/ano.
-              </div>
-              {selectedSchools.length === 0
-                ? <p className="text-gray-400 text-center py-8">Selecione escolas no Resumo</p>
-                : <Projecao5Anos schools={selectedSchools} ajustes={ajustes} configs={configs} />}
-            </div>
-          )}
-
-          {tab === "proscontras" && (
-            selectedSchools.length === 0
-              ? <p className="text-gray-400 text-center py-8">Selecione escolas no Resumo</p>
-              : <ProsContras schools={selectedSchools} />
-          )}
-
-          {tab === "ajustes" && (
-            <div className="space-y-6 max-w-2xl">
-              <div className="card p-4 border border-gray-100">
-                <h3 className="font-bold text-gray-700 mb-3">💳 Forma de Pagamento</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Modo de desconto</label>
-                    <select value={ajustes.modoDesconto} onChange={e => setAjustes(a => ({ ...a, modoDesconto: e.target.value }))}
-                      className="block mt-1 w-full border rounded-lg p-2 text-sm">
-                      <option value="base">Só desconto principal (mensal)</option>
-                      <option value="semestral">Pagamento semestral</option>
-                      <option value="anual">Pagamento anual (melhor desconto)</option>
-                    </select>
-                  </div>
-                  {ajustes.modoDesconto === "anual" && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">Anglo — forma (anual)</label>
-                      <select value={ajustes.angloFormaPgto} onChange={e => setAjustes(a => ({ ...a, angloFormaPgto: e.target.value }))}
-                        className="block mt-1 w-full border rounded-lg p-2 text-sm">
-                        <option value="boleto">Boleto (+5%)</option>
-                        <option value="cartao">Cartão (+3%)</option>
-                      </select>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id="pont" checked={ajustes.pontualidade}
-                      onChange={e => setAjustes(a => ({ ...a, pontualidade: e.target.checked }))} className="w-4 h-4" />
-                    <label htmlFor="pont" className="text-sm text-gray-600">Aplicar desconto pontualidade (Maple Bear 5%)</label>
-                  </div>
-                </div>
-              </div>
-              <div className="card p-4 border border-gray-100">
-                <h3 className="font-bold text-gray-700 mb-3">🎯 Itens Incluídos no Total</h3>
-                <div className="space-y-2">
-                  {[
-                    { key: "incluirNatacao", label: "🏊 Natação" },
-                    { key: "incluirFutsal", label: "⚽ Futsal" },
-                    { key: "incluirRedBalloon", label: "🔵 Red Balloon (inglês externo)" },
-                    { key: "incluirAlimentacao", label: "🍽️ Alimentação (onde aplicável)" },
-                    { key: "incluirMaterial", label: "📚 Material didático (÷12)" },
-                  ].map(item => (
-                    <div key={item.key} className="flex items-center gap-2">
-                      <input type="checkbox" id={item.key} checked={configs[item.key]}
-                        onChange={e => setConfigs(c => ({ ...c, [item.key]: e.target.checked }))} className="w-4 h-4" />
-                      <label htmlFor={item.key} className="text-sm text-gray-600">{item.label}</label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="card p-4 border border-gray-100">
-                <h3 className="font-bold text-gray-700 mb-3">💰 Custos das Atividades</h3>
-                <div className="space-y-4">
-                  {[
-                    { key: "custoNatacao", label: "Natação (externo)", min: 400, max: 1200 },
-                    { key: "custoFutsal", label: "Futsal (externo)", min: 100, max: 600 },
-                    { key: "custoRedBalloon", label: "Red Balloon", min: 1000, max: 2500 },
-                  ].map(item => (
-                    <div key={item.key}>
-                      <div className="flex justify-between text-sm mb-1">
-                        <label className="text-gray-600">{item.label}</label>
-                        <span className="font-bold text-indigo-700">{fmt(configs[item.key])}</span>
-                      </div>
-                      <input type="range" min={item.min} max={item.max} step={10} value={configs[item.key]}
-                        onChange={e => setConfigs(c => ({ ...c, [item.key]: Number(e.target.value) }))} className="w-full" />
-                      <div className="flex justify-between text-xs text-gray-400">
-                        <span>{fmt(item.min)}</span><span>{fmt(item.max)}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-800">
-                💡 Todos os cálculos atualizam em tempo real.
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="card p-4 border-l-4 border-red-500">
-        <div className="font-bold text-red-700 mb-2">🚨 Alertas Urgentes</div>
-        <div className="space-y-1 text-sm">
-          <div className="text-red-700">🔴 <strong>Anglo 35%:</strong> Formalizar desconto por escrito — PRAZO 20/06/2026</div>
-          <div className="text-red-700">🔴 <strong>Anglo geral:</strong> Reserva de vaga expira em 20/06/2026</div>
-          <div className="text-orange-700">🟡 <strong>Red Balloon:</strong> 1ª parcela 15% desc. expira 30/06/2026 (economia R$232,62)</div>
-          <div className="text-gray-500 text-xs mt-2">Última atualização dos dados: 16/06/2026</div>
-        </div>
-      </div>
-    </div>
-  );
+  document.getElementById('page-resumo').innerHTML =
+    `<p style="font-size:.8rem;color:#6b7280;margin-bottom:12px">Clique nos cards para selecionar/deselecionar da comparação detalhada.</p>${cards}${analise}`;
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+function renderComparar() {
+  const sel = getSel();
+  if(!sel.length){
+    document.getElementById('page-comparar').innerHTML='<p style="color:#9ca3af;text-align:center;padding:40px">Selecione pelo menos 1 escola no Resumo</p>';
+    return;
+  }
+  const bds = sel.map(e=>calcTotal(e));
+  const projs = sel.map(e=>calcProj(e));
+  const totals = bds.map(b=>b.total);
+  const projTots = projs.map(p=>p.tot);
+  const minT = Math.min(...totals);
+  const minP = Math.min(...projTots);
+
+  const rows = [
+    {label:'Mensalidade escola', key:'escola'},
+    {label:'Natação', key:'nat'},
+    {label:'Futsal', key:'fut'},
+    {label:'Red Balloon', key:'rb'},
+    {label:'Alimentação', key:'alm'},
+    {label:'Material (÷12)', key:'mat'},
+  ];
+
+  let th = `<th>Item</th>` + sel.map(e=>`<th class="center" style="color:${e.cor}">${e.nome}<br><span style="font-weight:400;font-size:.72rem;color:#6b7280">${e.mod}</span></th>`).join('');
+  let tbody = rows.map(r=>{
+    const vals = bds.map(b=>b[r.key]);
+    const minV = Math.min(...vals.filter(v=>v>0));
+    return `<tr><td>${r.label}</td>${vals.map(v=>
+      `<td class="center">${v===0?'<span style="color:#d1d5db">—</span>':fmtBRL(v)}</td>`
+    ).join('')}</tr>`;
+  }).join('');
+
+  // total
+  tbody += `<tr class="bold"><td>TOTAL MENSAL</td>${bds.map((b,i)=>
+    `<td class="center ${b.total===minT?'best-val':''}">${fmtBRL(b.total)}${b.total===minT?'<span class="best-label">🏆 menor</span>':''}</td>`
+  ).join('')}</tr>`;
+
+  // projeção
+  tbody += `<tr class="proj"><td>Total 5 anos</td>${projs.map((p,i)=>
+    `<td class="center ${p.tot===minP?'best-val':''}">${fmtBRL(p.tot)}${p.tot===minP?'<span class="best-label">🏆</span>':''}</td>`
+  ).join('')}</tr>`;
+
+  // info rows
+  const infoRows = [
+    {label:'Reajuste/ano', fn:e=>(e.reaj*100).toFixed(1)+'%'},
+    {label:'Horas/dia', fn:e=>e.horas+'h'},
+    {label:'Distância', fn:e=>e.dist},
+    {label:'Inglês', fn:e=>e.ingles},
+  ];
+  tbody += infoRows.map(r=>`<tr><td style="color:#9ca3af;font-size:.75rem">${r.label}</td>${sel.map(e=>`<td class="center" style="color:#9ca3af;font-size:.75rem">${r.fn(e)}</td>`).join('')}</tr>`).join('');
+
+  document.getElementById('page-comparar').innerHTML =
+    `<div style="overflow-x:auto"><table><thead><tr>${th}</tr></thead><tbody>${tbody}</tbody></table></div>`;
+}
+
+function renderProjecao() {
+  const sel = getSel();
+  if(!sel.length){
+    document.getElementById('page-projecao').innerHTML='<p style="color:#9ca3af;text-align:center;padding:40px">Selecione escolas no Resumo</p>';
+    return;
+  }
+  const anos = [2027,2028,2029,2030,2031];
+  const projs = sel.map(e=>calcProj(e));
+  const minTot = Math.min(...projs.map(p=>p.tot));
+
+  let th = `<th>Ano</th>` + sel.map(e=>`<th class="center" style="color:${e.cor}">${e.nome}<br><span style="font-weight:400;font-size:.72rem;color:#6b7280">${e.mod}</span></th>`).join('');
+  let tbody = anos.map((ano,i)=>{
+    const vals = projs.map(p=>p.anos[i]);
+    const minV = Math.min(...vals);
+    return `<tr><td><strong>${ano}</strong></td>${vals.map(v=>
+      `<td class="center ${v===minV?'best-val':''}">${fmtBRL(v)}${v===minV?' 🏆':''}</td>`
+    ).join('')}</tr>`;
+  }).join('');
+  tbody += `<tr class="bold"><td>TOTAL 5 ANOS</td>${projs.map(p=>
+    `<td class="center ${p.tot===minTot?'best-val':''}">${fmtBRL(p.tot)}${p.tot===minTot?'<span class="best-label">🏆 menor</span>':''}</td>`
+  ).join('')}</tr>`;
+
+  document.getElementById('page-projecao').innerHTML = `
+    <div class="warn-box">⚠️ Reajuste histórico usado: Anglo 12,5%/ano · Maple 9%/ano · Pentágono 8,7%/ano. Considera 13 parcelas/ano.</div>
+    <div style="overflow-x:auto"><table><thead><tr>${th}</tr></thead><tbody>${tbody}</tbody></table></div>`;
+}
+
+function renderProsContras() {
+  const sel = getSel();
+  if(!sel.length){
+    document.getElementById('page-proscontras').innerHTML='<p style="color:#9ca3af;text-align:center;padding:40px">Selecione escolas no Resumo</p>';
+    return;
+  }
+  const html = `<div class="grid2">${sel.map(e=>`
+    <div class="pros-card" style="border-left-color:${e.cor}">
+      <div style="font-weight:700;color:${e.cor}">${e.nome}</div>
+      <div style="font-size:.78rem;color:#6b7280;margin-bottom:12px">${e.mod}</div>
+      <h3 style="color:#16a34a;font-size:.75rem">✅ PRÓS</h3>
+      ${e.pros.map(p=>`<div class="pro-item"><span class="pro-dot">•</span><span>${p}</span></div>`).join('')}
+      <h3 style="color:#ef4444;font-size:.75rem;margin-top:12px">❌ CONTRAS</h3>
+      ${e.contras.map(c=>`<div class="con-item"><span class="con-dot">•</span><span>${c}</span></div>`).join('')}
+      ${e.alertas.length?`<div class="alert-box"><div class="alert-title">⚠️ ALERTAS</div>${e.alertas.map(a=>`<div class="alert-item">${a}</div>`).join('')}</div>`:''}
+    </div>`).join('')}</div>`;
+  document.getElementById('page-proscontras').innerHTML = html;
+}
+
+function renderAjustes() {
+  document.getElementById('page-ajustes').innerHTML = `
+  <div style="max-width:600px">
+    <div class="card">
+      <h2>💳 Forma de Pagamento</h2>
+      <label>Modo de desconto</label>
+      <select onchange="setEstado('modo',this.value)">
+        <option value="base" ${estado.modo==='base'?'selected':''}>Só desconto principal (mensal)</option>
+        <option value="semestral" ${estado.modo==='semestral'?'selected':''}>Pagamento semestral</option>
+        <option value="anual" ${estado.modo==='anual'?'selected':''}>Pagamento anual (melhor desconto)</option>
+      </select>
+      ${estado.modo==='anual'?`
+      <label>Anglo — forma de pagamento anual</label>
+      <select onchange="setEstado('angloFmt',this.value)">
+        <option value="boleto" ${estado.angloFmt==='boleto'?'selected':''}>Boleto (+5%)</option>
+        <option value="cartao" ${estado.angloFmt==='cartao'?'selected':''}>Cartão (+3%)</option>
+      </select>`:''}
+      <div class="checkbox-row">
+        <input type="checkbox" id="pont" ${estado.pontualidade?'checked':''} onchange="setEstado('pontualidade',this.checked)">
+        <label for="pont">Aplicar desconto pontualidade Maple Bear (5%)</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Itens Incluídos no Total</h2>
+      ${[
+        ['natacao','🏊 Natação'],
+        ['futsal','⚽ Futsal'],
+        ['redballoon','🔵 Red Balloon (inglês externo)'],
+        ['alimentacao','🍽️ Alimentação (onde aplicável)'],
+        ['material','📚 Material didático (÷12)'],
+      ].map(([k,l])=>`
+      <div class="checkbox-row">
+        <input type="checkbox" id="${k}" ${estado[k]?'checked':''} onchange="setEstado('${k}',this.checked)">
+        <label for="${k}">${l}</label>
+      </div>`).join('')}
+    </div>
+
+    <div class="card">
+      <h2>💰 Custos das Atividades</h2>
+      ${[
+        ['custoNat','Natação (externo)',400,1200],
+        ['custoFut','Futsal (externo)',100,600],
+        ['custoRB','Red Balloon',1000,2500],
+      ].map(([k,l,mn,mx])=>`
+      <label>${l} <span class="range-val">${fmtBRL(estado[k])}</span></label>
+      <input type="range" min="${mn}" max="${mx}" step="10" value="${estado[k]}" oninput="setEstado('${k}',+this.value)">
+      <div class="range-labels"><span>${fmtBRL(mn)}</span><span>${fmtBRL(mx)}</span></div>`).join('')}
+    </div>
+
+    <div class="info-box">💡 Todos os cálculos atualizam em tempo real em todas as abas.</div>
+  </div>`;
+}
+
+function setEstado(key, val) {
+  estado[key] = val;
+  render();
+}
+
+function render() {
+  renderBadges();
+  renderResumo();
+  renderComparar();
+  renderProjecao();
+  renderProsContras();
+  renderAjustes();
+}
+
+function showTab(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// init
+render();
 </script>
 </body>
 </html>
