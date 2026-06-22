@@ -239,13 +239,21 @@ var PCTS=[0,5,10,15,20,25,30,35];
 // ════════════════════════════════════════════
 //  ESTADO
 // ════════════════════════════════════════════
+function discPadraoD1(eid,midx){
+  // Desconto principal padrão por escola/modalidade
+  if(eid==='pentagono') return midx===0?15:0; // 15% só no Regular
+  if(eid==='maple') return 10;
+  if(eid==='anglo') return midx===0?25:35;
+  return 0;
+}
+
 var ST={};
 EIDS.forEach(function(eid){
   var d=DEF[eid], m=d.mods[0];
   ST[eid]={
     ativa:true, midx:0,
-    disc1:0,    // desconto principal %
-    disc2:0,    // desconto adicional %
+    disc1:discPadraoD1(eid,0),
+    disc2:0,
     custom1:false, custom2:false,
     atv: JSON.parse(JSON.stringify(m.pad))
   };
@@ -374,12 +382,22 @@ function renderDescontos(){
     '</div>';
     var warnHtml=m.disc_warn?'<div class="disc-warn">⚠️ '+m.disc_warn+'</div>':'';
 
-    // botões disc1
-    var btn1=PCTS.map(function(p){
-      return '<button class="pct-btn'+(e.disc1===p&&!e.custom1?' on':'')+'" onclick="setDisc(\''+eid+'\',1,'+p+')">'+p+'%</button>';
-    }).join('')+
-    '<button class="pct-btn'+(e.custom1?' on':'')+'" onclick="setCustom(\''+eid+'\',1)">✏️ Personalizado</button>'+
-    (e.custom1?'<input class="pct-custom" type="number" min="0" max="99" step="0.5" value="'+e.disc1+'" onchange="setDiscVal(\''+eid+'\',1,+this.value)" oninput="setDiscVal(\''+eid+'\',1,+this.value)">':'');
+    // Pentágono Semi: bloqueia disc principal (15% só no Regular)
+    var pentSemiBloq = eid==='pentagono' && e.midx>0;
+    var btn1;
+    if(pentSemiBloq){
+      btn1='<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:7px;padding:8px 10px;font-size:.75rem;color:#dc2626">'+
+        '🚫 <strong>Desconto 15% Gênesis 2 não se aplica a esta modalidade.</strong><br>'+
+        '<span style="color:#6b7280">Exclusivo do Regular. Nenhum desconto principal disponível para '+m.label+'.</span>'+
+        '<br><strong style="font-size:.8rem">Desconto principal fixado em 0%.</strong>'+
+      '</div>';
+    } else {
+      btn1=PCTS.map(function(p){
+        return '<button class="pct-btn'+(e.disc1===p&&!e.custom1?' on':'')+'" onclick="setDisc(\''+eid+'\',1,'+p+')">'+p+'%</button>';
+      }).join('')+
+      '<button class="pct-btn'+(e.custom1?' on':'')+'" onclick="setCustom(\''+eid+'\',1)">✏️ Personalizado</button>'+
+      (e.custom1?'<input class="pct-custom" type="number" min="0" max="99" step="0.5" value="'+e.disc1+'" onchange="setDiscVal(\''+eid+'\',1,+this.value)" oninput="setDiscVal(\''+eid+'\',1,+this.value)">':'');
+    }
 
     // botões disc2
     var btn2=PCTS.map(function(p){
@@ -615,12 +633,20 @@ function toggleE(eid,v){ST[eid].ativa=v;render();}
 function setMod(eid,idx){
   ST[eid].midx=idx;
   ST[eid].atv=JSON.parse(JSON.stringify(DEF[eid].mods[idx].pad));
+  // Pentágono: 15% Gênesis 2 só no Regular (idx=0); Semi: força disc1=0
+  ST[eid].disc1=discPadraoD1(eid,idx);
+  ST[eid].custom1=false;
   render();
 }
 
 function setDisc(eid,n,pct){
-  if(n===1){ST[eid].disc1=pct;ST[eid].custom1=false;}
-  else{ST[eid].disc2=pct;ST[eid].custom2=false;}
+  if(n===1){
+    // Pentágono Semi: disc1 bloqueado em 0
+    if(eid==='pentagono'&&ST[eid].midx>0) return;
+    ST[eid].disc1=pct; ST[eid].custom1=false;
+  } else {
+    ST[eid].disc2=pct; ST[eid].custom2=false;
+  }
   render();
 }
 
@@ -631,8 +657,12 @@ function setCustom(eid,n){
 }
 
 function setDiscVal(eid,n,v){
-  if(n===1)ST[eid].disc1=v;
-  else ST[eid].disc2=v;
+  if(n===1){
+    if(eid==='pentagono'&&ST[eid].midx>0) return;
+    ST[eid].disc1=v;
+  } else {
+    ST[eid].disc2=v;
+  }
   render();
 }
 
