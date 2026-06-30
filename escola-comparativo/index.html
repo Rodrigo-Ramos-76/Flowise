@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Comparativo de Escolas — Gustavo 2026/2027</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;color:#1f2937;font-size:14px}
+.hdr{background:#fff;padding:16px 20px;border-bottom:1px solid #e5e7eb}
+.hdr h1{font-size:1.2rem;font-weight:900}
+.hdr p{font-size:.75rem;color:#6b7280;margin-top:2px}
+.tabs{background:#fff;display:flex;overflow-x:auto;border-bottom:2px solid #e5e7eb;position:sticky;top:0;z-index:20}
+.tab{padding:10px 15px;cursor:pointer;font-size:.8rem;color:#6b7280;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.15s}
+.tab:hover{color:#4f46e5}
+.tab.on{color:#4f46e5;font-weight:700;border-bottom-color:#4f46e5}
+.wrap{padding:14px 14px 40px;max-width:1400px;margin:0 auto}
+.pg{display:none}.pg.on{display:block}
+
+/* layout */
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.cols2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:900px){.cols3,.cols2{grid-template-columns:1fr}}
+.card{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:14px;margin-bottom:12px}
+.card-h{font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card-h .cor{width:4px;height:18px;border-radius:2px;flex-shrink:0}
+
+/* school header strip */
+.sch-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #f3f4f6}
+.sch-name{font-size:1rem;font-weight:800}
+.sch-tag{font-size:.68rem;padding:2px 7px;border-radius:4px;background:#fef9c3;color:#854d0e;font-weight:600;margin-left:4px}
+.sch-desc{font-size:.76rem;color:#4b5563;line-height:1.6;margin-bottom:10px;background:#f9fafb;border-radius:7px;padding:10px}
+
+/* select */
+.fld{margin-bottom:10px}
+.fld label{font-size:.74rem;color:#6b7280;font-weight:600;display:block;margin-bottom:4px}
+.fld select{width:100%;border:1px solid #d1d5db;border-radius:7px;padding:6px 8px;font-size:.78rem;background:#fff}
+
+/* hours table */
+.hrs-tbl{width:100%;border-collapse:collapse;font-size:.76rem;margin-bottom:8px}
+.hrs-tbl th{padding:5px 8px;background:#f3f4f6;text-align:left;font-size:.72rem;color:#6b7280;font-weight:600;border-bottom:1px solid #e5e7eb}
+.hrs-tbl td{padding:5px 8px;border-bottom:1px solid #f9fafb}
+.hrs-tbl .sub{color:#9ca3af;font-size:.7rem}
+.turno-bar{display:flex;border-radius:6px;overflow:hidden;height:20px;margin:6px 0}
+.t-seg{background:#c7d2fe;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:#3730a3;font-weight:600}
+.t-cont{background:#bbf7d0;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:#14532d;font-weight:600}
+.t-livre{background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:#9ca3af}
+.leg{display:flex;gap:10px;font-size:.68rem;color:#6b7280;margin-bottom:6px}
+.leg span{display:flex;align-items:center;gap:4px}
+.leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* discounts */
+.disc-card{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:14px;margin-bottom:12px}
+.disc-school-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #f3f4f6}
+.disc-ref{font-size:.72rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:7px;padding:8px 10px;margin-bottom:10px;color:#14532d}
+.disc-ref-item{margin-bottom:3px}
+.disc-warn{font-size:.72rem;background:#fefce8;border:1px solid #fde68a;border-radius:7px;padding:8px 10px;margin-bottom:10px;color:#854d0e}
+.pct-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.pct-btn{padding:4px 10px;border-radius:6px;border:1px solid #d1d5db;font-size:.76rem;cursor:pointer;background:#f9fafb;transition:.15s;font-weight:500}
+.pct-btn:hover{background:#eef2ff;border-color:#a5b4fc}
+.pct-btn.on{background:#4f46e5;color:#fff;border-color:#4f46e5;font-weight:700}
+.pct-custom{border:1px solid #d1d5db;border-radius:6px;padding:4px 8px;font-size:.76rem;width:70px;background:#fff}
+.price-flow{display:flex;align-items:center;gap:6px;font-size:.78rem;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid #f3f4f6}
+.price-bruto{color:#9ca3af;text-decoration:line-through}
+.price-arrow{color:#9ca3af}
+.price-final{font-size:1rem;font-weight:900}
+.price-eco{font-size:.72rem;color:#059669;background:#dcfce7;padding:2px 7px;border-radius:4px;font-weight:600}
+.disc-section{margin-bottom:10px}
+.disc-section-title{font-size:.72rem;font-weight:700;color:#6b7280;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+
+/* activities equalization */
+.eq-global{background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:14px;margin-bottom:14px}
+.eq-title{font-weight:700;color:#3730a3;margin-bottom:10px;font-size:.88rem}
+.eq-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+@media(max-width:700px){.eq-grid{grid-template-columns:repeat(2,1fr)}}
+.eq-item{background:#fff;border-radius:8px;padding:10px;text-align:center;cursor:pointer;border:2px solid #e0e7ff;transition:.15s}
+.eq-item.on{border-color:#4f46e5;background:#f5f3ff}
+.eq-item .icon{font-size:1.2rem}
+.eq-item .lbl{font-size:.72rem;color:#374151;margin-top:4px;font-weight:500}
+.eq-item.on .lbl{color:#4f46e5;font-weight:700}
+
+/* activity per school */
+.atv-tbl{width:100%;border-collapse:collapse;font-size:.76rem}
+.atv-tbl th{padding:5px 8px;text-align:left;color:#6b7280;font-size:.7rem;font-weight:600;border-bottom:1px solid #e5e7eb}
+.atv-tbl td{padding:5px 8px;border-bottom:1px solid #f9fafb;vertical-align:middle}
+.atv-tbl tr:last-child td{border-bottom:none}
+.atv-btns{display:flex;gap:3px;flex-wrap:wrap}
+.atv-btn{padding:2px 7px;border-radius:4px;border:1px solid #d1d5db;font-size:.68rem;cursor:pointer;background:#f9fafb;white-space:nowrap;transition:.15s}
+.atv-btn.inc{background:#dcfce7;border-color:#16a34a;color:#15803d;font-weight:700}
+.atv-btn.ext{background:#dbeafe;border-color:#2563eb;color:#1d4ed8;font-weight:700}
+.atv-btn.nao{background:#f3f4f6;border-color:#9ca3af;color:#6b7280;font-weight:700}
+.custo-in{border:1px solid #d1d5db;border-radius:5px;padding:3px 6px;font-size:.74rem;width:80px}
+.custo-in:disabled{background:#f9fafb;color:#9ca3af;border-color:#e5e7eb}
+
+/* results */
+.rank-pill{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:999px}
+.r1{background:#ffd700;color:#78350f}
+.r2{background:#c6efce;color:#14532d}
+.r3{background:#fee2e2;color:#991b1b}
+.sum-card{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:14px;border-left:4px solid}
+.sum-total{font-size:1.35rem;font-weight:900;margin:5px 0 2px}
+
+/* compare table */
+.cmp{width:100%;border-collapse:collapse;font-size:.79rem}
+.cmp th{padding:8px 10px;border-bottom:2px solid #e5e7eb;font-weight:600;font-size:.75rem;text-align:center}
+.cmp th.lft{text-align:left}
+.cmp td{padding:6px 10px;border-bottom:1px solid #f3f4f6;text-align:center}
+.cmp td.lft{text-align:left;color:#6b7280}
+.cmp tr:hover td{background:#f9fafb}
+.cmp .rbold td{font-weight:700;background:#eef2ff}
+.cmp .rproj td{font-weight:700;background:#fefce8}
+.bv{color:#059669;font-weight:700}
+.bl{font-size:.63rem;color:#059669;display:block}
+
+/* misc */
+.info{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:9px 12px;font-size:.75rem;color:#1e40af;margin-bottom:12px}
+.warn{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:9px 12px;font-size:.75rem;color:#854d0e;margin-bottom:12px}
+.danger{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.07);padding:12px 16px;border-left:4px solid #ef4444;margin-top:14px}
+.tot-footer{display:flex;justify-content:space-between;align-items:center;padding-top:8px;margin-top:8px;border-top:1px solid #f3f4f6}
+.badge-inc{font-size:.68rem;padding:1px 6px;border-radius:4px;background:#dcfce7;color:#15803d;font-weight:600}
+.badge-ext{font-size:.68rem;padding:1px 6px;border-radius:4px;background:#dbeafe;color:#1d4ed8;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>🏫 Comparativo de Escolas — Gustavo</h1>
+  <p>1º Ano Fundamental · Gênesis 2, Alphaville · 2026/2027</p>
+</div>
+
+<div class="tabs">
+  <div class="tab on"  onclick="T(this,'escolas')">🏫 Escolas</div>
+  <div class="tab"     onclick="T(this,'descontos')">🏷️ Descontos</div>
+  <div class="tab"     onclick="T(this,'atividades')">🎯 Atividades</div>
+  <div class="tab"     onclick="T(this,'resumo')">📊 Resumo</div>
+  <div class="tab"     onclick="T(this,'comparar')">⚖️ Comparar</div>
+  <div class="tab"     onclick="T(this,'projecao')">📈 Projeção 5 Anos</div>
+</div>
+
+<div class="wrap">
+  <div id="p-escolas"    class="pg on"></div>
+  <div id="p-descontos"  class="pg"></div>
+  <div id="p-atividades" class="pg"></div>
+  <div id="p-resumo"     class="pg"></div>
+  <div id="p-comparar"   class="pg"></div>
+  <div id="p-projecao"   class="pg"></div>
+
+  <div class="danger">
+    <strong style="color:#dc2626">🚨 Alertas</strong>
+    <span style="color:#dc2626;font-size:.8rem"> · 🔴 Anglo: formalizar 35% por escrito — PRAZO 20/06/2026</span>
+    <span style="color:#d97706;font-size:.8rem"> · 🟡 Red Balloon: 15% desc. na 1ª parcela expira 30/06/2026</span>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+//  DADOS
+// ════════════════════════════════════════════
+var DEF = {
+  anglo: {
+    nome:'Anglo Da Vinci', cor:'#6366f1', ativa:true,
+    descricao:'Sistema Anglo de ensino — um dos maiores sistemas privados do Brasil, com foco em ENEM e vestibulares. Método proprietário "Aprender a Estudar": agenda estruturada, disciplina de estudos e organização de conteúdo. Funcionamento <strong>integral em turno único</strong> (não há contra-turno separado — o dia completo é o próprio turno). Inglês Cambridge integrado ao currículo. Material didático próprio (kit anual pago à parte). Distância do Gênesis 2: ~15–25 min.',
+    enem:'Top 5 SP', ingles:'Cambridge ✓', dist:'~15–25 min',
+    pros:['Melhor ranking ENEM (Top 5 SP)','Cambridge incluso na mensalidade','Método estruturado de estudos (Aprender a Estudar)','Horário integral — sem necessidade de contra-turno'],
+    contras:['Maior reajuste histórico (10–15%/ano + degrau letivo)','Desconto revisável a qualquer momento','Alimentação (cantina terceirizada) a confirmar','Material R$3.850/ano com reajuste previsto'],
+    mods:[
+      { id:'a25', label:'25% desconto (confirmado)', bruto:6826.26, reaj:0.125, tag:'✅ Confirmado',
+        turno:{e:'7h20',s:'15h30',h:8.17,d:5}, contraturno:null,
+        disc_ref:['25% parceria — confirmado','+ 3% cartão anual (cumulativo)','+ 5% boleto anual (cumulativo)'],
+        disc_warn:'Desconto revisável a qualquer momento pela escola.',
+        pad:{nat:{s:'ext',c:715},fut:{s:'ext',c:280},rb:{s:'inc',c:0,n:'Cambridge incluso'},alim:{s:'nao',c:0,n:'Cantina (a confirmar)'},mat:{s:'ext',c:321,n:'R$3.850/ano ÷12'}} },
+      { id:'a35', label:'35% desconto ⭐ (formalizar)', bruto:6826.26, reaj:0.125, tag:'⚠️ URGENTE',
+        turno:{e:'7h20',s:'15h30',h:8.17,d:5}, contraturno:null,
+        disc_ref:['35% parceria — VERBAL, precisa ser formalizado','+ 3% cartão anual (cumulativo)','+ 5% boleto anual (cumulativo)'],
+        disc_warn:'⚠️ Desconto verbal — EXIGIR confirmação por escrito antes de qualquer decisão. Prazo: 20/06/2026.',
+        pad:{nat:{s:'ext',c:715},fut:{s:'ext',c:280},rb:{s:'inc',c:0,n:'Cambridge incluso'},alim:{s:'nao',c:0,n:'Cantina (a confirmar)'},mat:{s:'ext',c:321,n:'R$3.850/ano ÷12'}} },
+    ]
+  },
+  maple: {
+    nome:'Maple Bear', cor:'#d97706', ativa:true,
+    descricao:'Rede canadense de educação bilíngue presente em 30+ países. Currículo em inglês integrado ao dia a dia — não é aula de inglês isolada, é ensino <em>em inglês</em>. Dois turnos possíveis: <strong>manhã (turno regular)</strong> e <strong>B&A — Before & After (contra-turno)</strong>. Sem taxa de matrícula. Material próprio SLM+ obrigatório, comprado exclusivamente na plataforma após matrícula. Distância: ~10–15 min do Gênesis 2.',
+    enem:'Rede global canadense', ingles:'Bilíngue canadense ✓', dist:'~10–15 min',
+    pros:['Bilíngue canadense integrado ao currículo','Melhor combinação de descontos (11%+10% cumulativos)','Reajuste ~9%/ano — mais previsível','Sem taxa de matrícula'],
+    contras:['Horário curto no turno manhã (5h20)','Material SLM+ R$4.065/ano obrigatório + livros à parte','B&A (contra-turno) aumenta o custo significativamente'],
+    mods:[
+      { id:'mm', label:'Só Manhã — turno regular', bruto:5989.10, reaj:0.09, tag:'Regular',
+        turno:{e:'7h30',s:'12h50',h:5.33,d:5}, contraturno:null,
+        disc_ref:['10% irmandade — confirmado','+ 5% pontualidade (1º dia útil)','+ 7% semestral sobre bruto','+ 11% anual sobre bruto (cumul. c/ 10%) ⭐'],
+        disc_warn:null,
+        pad:{nat:{s:'ext',c:715},fut:{s:'ext',c:280},rb:{s:'inc',c:0,n:'Bilíngue canadense incluso'},alim:{s:'nao',c:0,n:'Cantina livre no intervalo'},mat:{s:'ext',c:339,n:'SLM+ R$4.065/ano ÷12'}} },
+      { id:'mba', label:'Manhã + B&A (Before & After)', bruto:8838.10, reaj:0.09, tag:'Integral',
+        turno:{e:'7h30',s:'12h50',h:5.33,d:5}, contraturno:{e:'12h50',s:'17h30',h:4.67,d:5,n:'B&A — Before & After'},
+        disc_ref:['10% irmandade — confirmado','+ 5% pontualidade (1º dia útil)','+ 7% semestral sobre bruto','+ 11% anual sobre bruto (cumul. c/ 10%) ⭐'],
+        disc_warn:null,
+        pad:{nat:{s:'ext',c:715},fut:{s:'ext',c:280},rb:{s:'inc',c:0,n:'Bilíngue canadense incluso'},alim:{s:'inc',c:0,n:'Almoço+lanche inclusos (~R$600/mês)'},mat:{s:'ext',c:339,n:'SLM+ R$4.065/ano ÷12'}} },
+    ]
+  },
+  pentagono: {
+    nome:'Pentágono', cor:'#059669', ativa:true,
+    descricao:'Escola humanista — 1º lugar no ENEM em Santana de Parnaíba. Filosofia de educação integral que respeita o ritmo individual de cada aluno. <strong>Turno regular</strong> é a manhã (5h). As modalidades semi-integrais estendem o dia no <strong>contra-turno</strong>, com atividades esportivas, culturais e idioma. <strong>Inglês Cambridge desde o 1º ano</strong>: 4 aulas/semana com professora especialista (~50 min cada), usando livros didáticos Cambridge. Proposta extracurricular de imersão real — inglês no almoço, recreio, bosque e projetos (além das aulas). Certificação Cambridge a partir do 3º ano (a cada 2 anos). A mais próxima do Gênesis 2 (~5–10 min). Desconto Gênesis 2 (15%) é <em>exclusivo do Regular</em>. <em>Nota sobre desconto: a escola foi transparente que não consegue igualar os percentuais de outras instituições.</em>',
+    enem:'1º Santana de Parnaíba', ingles:'Cambridge ✓ (4 aulas/sem, desde o 1º ano)', dist:'~5–10 min 🏆',
+    pros:['Mais próxima do Gênesis 2 🏆 (~5–10 min)','Menor reajuste histórico (~8,7%/ano)','1º lugar ENEM em Santana de Parnaíba','Cambridge desde o 1º ano — 4 aulas/sem com especialista','Imersão real em inglês (almoço, recreio, bosque, projetos)','Certificação Cambridge a partir do 3º ano (a cada 2 anos)','Natação inclusa no Semi Integral 5x (economia R$715)'],
+    contras:['Desconto 15% Gênesis 2 exclusivo do Regular','Escola transparente: não iguala % de desconto de outras escolas','Alimentação ~R$520/mês nas modalidades semi-integrais'],
+    mods:[
+      { id:'pr', label:'Regular — turno manhã', bruto:4955.51, reaj:0.087, tag:'15% Gênesis 2',
+        turno:{e:'7h30',s:'12h30',h:5.0,d:5}, contraturno:null,
+        disc_ref:['15% Gênesis 2 — EXCLUSIVO do Regular ✅','+ 2,5% semestral sobre líquido','+ 5% anual sobre líquido'],
+        disc_warn:'15% Gênesis 2 definitivamente confirmado — NÃO se aplica às semi-integrais. Escola foi transparente: não consegue igualar os percentuais de outras instituições.',
+        pad:{nat:{s:'ext',c:715},fut:{s:'ext',c:280},rb:{s:'nao',c:0,n:'Cambridge 4 aulas/sem incluso no Regular'},alim:{s:'nao',c:0},mat:{s:'nao',c:0,n:'Não informado'}} },
+      { id:'p3', label:'Semi Integral 3x/sem', bruto:6702.76, reaj:0.087, tag:'Sem desc. G2',
+        turno:{e:'7h30',s:'12h30',h:5.0,d:5}, contraturno:{e:'12h30',s:'15h30',h:3.0,d:3,n:'Semi Integral (3 dias/sem)'},
+        disc_ref:['Sem desconto Gênesis 2 nessa modalidade','+ 2,5% semestral sobre líquido','+ 5% anual sobre líquido'],
+        disc_warn:'Desconto 15% Gênesis 2 não se aplica a esta modalidade.',
+        pad:{nat:{s:'ext',c:715},fut:{s:'ext',c:280},rb:{s:'inc',c:0,n:'Learn&Play+Cambridge incluso'},alim:{s:'ext',c:520,n:'R$31,20/dia ~R$520/mês'},mat:{s:'nao',c:0}} },
+      { id:'p5', label:'Semi Integral 5x/sem', bruto:6972.15, reaj:0.087, tag:'🏊 Nat. inclusa',
+        turno:{e:'7h30',s:'12h30',h:5.0,d:5}, contraturno:{e:'12h30',s:'15h30',h:3.0,d:5,n:'Semi Integral (5 dias/sem)'},
+        disc_ref:['Sem desconto Gênesis 2 nessa modalidade','+ 2,5% semestral sobre líquido','+ 5% anual sobre líquido'],
+        disc_warn:'Natação inclusa nesta modalidade — economia de R$715/mês.',
+        pad:{nat:{s:'inc',c:0,n:'Natação inclusa — economia R$715'},fut:{s:'ext',c:280},rb:{s:'inc',c:0,n:'Learn&Play+Cambridge incluso'},alim:{s:'ext',c:520,n:'R$31,20/dia ~R$520/mês'},mat:{s:'nao',c:0}} },
+      { id:'p5n', label:'Semi 5x + Nat. extra (2x)', bruto:6972.15, reaj:0.087, tag:'🏊 Nat. extra',
+        turno:{e:'7h30',s:'12h30',h:5.0,d:5}, contraturno:{e:'12h30',s:'15h30',h:3.0,d:5,n:'Semi Integral (5 dias/sem)'},
+        disc_ref:['Sem desconto Gênesis 2 nessa modalidade','+ 2,5% semestral sobre líquido','+ 5% anual sobre líquido'],
+        disc_warn:'1x natação inclusa + 1x avulsa (R$507). Total 2x/semana.',
+        pad:{nat:{s:'inc',c:507,n:'1x inclusa + avulsa R$507/mês'},fut:{s:'ext',c:280},rb:{s:'inc',c:0,n:'Learn&Play+Cambridge incluso'},alim:{s:'ext',c:520,n:'R$31,20/dia ~R$520/mês'},mat:{s:'nao',c:0}} },
+    ]
+  }
+};
+
+var ATVS=[
+  {k:'nat',  l:'🏊 Natação',    icon:'🏊'},
+  {k:'fut',  l:'⚽ Futsal',     icon:'⚽'},
+  {k:'rb',   l:'🔵 Red Balloon',icon:'🔵'},
+  {k:'alim', l:'🍽️ Alimentação',icon:'🍽️'},
+  {k:'mat',  l:'📚 Material',   icon:'📚'},
+];
+var EIDS=['anglo','maple','pentagono'];
+var PCTS=[0,5,10,15,20,25,30,35];
+
+// ════════════════════════════════════════════
+//  ESTADO
+// ════════════════════════════════════════════
+function discPadraoD1(eid,midx){
+  // Desconto principal padrão por escola/modalidade
+  if(eid==='pentagono') return midx===0?15:0; // 15% só no Regular
+  if(eid==='maple') return 10;
+  if(eid==='anglo') return midx===0?25:35;
+  return 0;
+}
+
+var ST={};
+EIDS.forEach(function(eid){
+  var d=DEF[eid], m=d.mods[0];
+  ST[eid]={
+    ativa:true, midx:0,
+    disc1:discPadraoD1(eid,0),
+    disc2:0,
+    custom1:false, custom2:false,
+    atv: JSON.parse(JSON.stringify(m.pad))
+  };
+});
+
+// equalização global
+var EQ={nat:true,fut:true,rb:true,alim:true,mat:true};
+
+// ════════════════════════════════════════════
+//  CÁLCULOS
+// ════════════════════════════════════════════
+function getMod(eid){return DEF[eid].mods[ST[eid].midx];}
+
+function calcEscola(eid){
+  var e=ST[eid], m=getMod(eid);
+  var d=(e.disc1+e.disc2)/100;
+  if(d>0.99)d=0.99;
+  return m.bruto*(1-d);
+}
+
+function calcExtras(eid){
+  var tot=0;
+  ATVS.forEach(function(a){
+    var cfg=ST[eid].atv[a.k];
+    if(cfg.s==='ext') tot+=Number(cfg.c||0);
+  });
+  return tot;
+}
+
+function calcTotal(eid){
+  var e=calcEscola(eid), x=calcExtras(eid);
+  return {e:e, x:x, t:e+x};
+}
+
+function calcProj(eid){
+  var m=getMod(eid), base=calcTotal(eid).t, tot=0, anos=[];
+  for(var i=0;i<5;i++){var v=base*Math.pow(1+m.reaj,i);tot+=v*13;anos.push(v);}
+  return {anos:anos,tot:tot};
+}
+
+function R(v){return Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function Rp(v){return Number(v).toFixed(1)+'%';}
+
+// ════════════════════════════════════════════
+//  RENDER ESCOLAS
+// ════════════════════════════════════════════
+function renderEscolas(){
+  var html='<div class="info">Esta aba mostra a <strong>descrição de cada escola</strong>, a modalidade selecionada e a divisão dos horários em <span style="color:#3730a3">■ Turno</span> e <span style="color:#14532d">■ Contra-turno</span>. Selecione a modalidade e ative/desative escolas aqui.</div><div class="cols3">';
+
+  EIDS.forEach(function(eid){
+    var d=DEF[eid], e=ST[eid], m=getMod(eid);
+    var modOpts=d.mods.map(function(md,i){
+      return '<option value="'+i+'"'+(e.midx===i?' selected':'')+'>'+md.label+(md.tag?' ['+md.tag+']':'')+'</option>';
+    }).join('');
+
+    // horas
+    var ht=m.turno.h, hc=m.contraturno?m.contraturno.h:0, hl=17-m.turno.h-hc-(m.turno.e==='7h20'?0.33:0.5);
+    if(hl<0)hl=0;
+    var tot_dia=ht+hc;
+    var tot_sem=ht*5+(m.contraturno?m.contraturno.h*m.contraturno.d:0);
+
+    // barra visual (base 9h: 7h30-16h30)
+    var span=9;
+    var pw=function(h){return Math.round(h/span*100)+'%';};
+
+    var hoursTable='<table class="hrs-tbl">'+
+      '<tr><th>Período</th><th>Entrada</th><th>Saída</th><th>Horas</th><th>Dias</th></tr>'+
+      '<tr><td><strong style="color:#3730a3">Turno</strong></td><td>'+m.turno.e+'</td><td>'+m.turno.s+'</td><td><strong>'+m.turno.h.toFixed(1)+'h</strong></td><td>'+m.turno.d+'x/sem</td></tr>'+
+      (m.contraturno?
+        '<tr><td><strong style="color:#14532d">Contra-turno</strong></td><td>'+m.contraturno.e+'</td><td>'+m.contraturno.s+'</td><td><strong>'+m.contraturno.h.toFixed(1)+'h</strong></td><td>'+m.contraturno.d+'x/sem</td></tr>'
+        :'<tr><td style="color:#9ca3af">Contra-turno</td><td colspan="4" style="color:#9ca3af">— não há (turno único)</td></tr>')+
+      '<tr style="background:#f9fafb"><td><strong>Total</strong></td><td></td><td></td><td><strong>'+tot_dia.toFixed(1)+'h/dia</strong></td><td><strong>~'+tot_sem.toFixed(0)+'h/sem</strong></td></tr>'+
+    '</table>';
+
+    // barra visual
+    var bars='<div class="leg"><span><span class="leg-dot" style="background:#c7d2fe"></span>Turno ('+m.turno.h.toFixed(1)+'h)</span>'+
+      (m.contraturno?'<span><span class="leg-dot" style="background:#bbf7d0"></span>Contra-turno ('+m.contraturno.h.toFixed(1)+'h)</span>':'')+
+      '<span><span class="leg-dot" style="background:#f3f4f6"></span>Livre</span></div>'+
+      '<div class="turno-bar">'+
+        '<div class="t-seg" style="width:'+pw(ht)+'">'+m.turno.h.toFixed(0)+'h</div>'+
+        (m.contraturno?'<div class="t-cont" style="width:'+pw(hc)+'">'+hc.toFixed(0)+'h</div>':'')+
+        (hl>0?'<div class="t-livre" style="width:'+pw(hl)+'">livre</div>':'')+
+      '</div>';
+
+    html+='<div class="card" style="border-top:3px solid '+d.cor+';opacity:'+(e.ativa?1:.55)+'">' +
+      '<div class="sch-hdr">'+
+        '<div style="flex:1">'+
+          '<div class="sch-name" style="color:'+d.cor+'">'+d.nome+'</div>'+
+          '<div style="font-size:.72rem;color:#6b7280">'+m.label+(m.tag?' · <span class="sch-tag">'+m.tag+'</span>':'')+'</div>'+
+        '</div>'+
+        '<label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:.76rem;color:#6b7280">'+
+          '<input type="checkbox"'+(e.ativa?' checked':'')+' onchange="toggleE(\''+eid+'\',this.checked)" style="width:15px;height:15px;accent-color:#4f46e5"> Incluir'+
+        '</label>'+
+      '</div>'+
+      '<div class="sch-desc">'+d.descricao+'</div>'+
+      '<div class="fld"><label>Modalidade</label><select onchange="setMod(\''+eid+'\',+this.value)">'+modOpts+'</select></div>'+
+      hoursTable+bars+
+      '<div class="tot-footer">'+
+        '<span style="font-size:.74rem;color:#6b7280">Mensalidade escola: '+R(calcEscola(eid))+'</span>'+
+        '<strong style="color:'+d.cor+'">Total c/ atividades: '+R(calcTotal(eid).t)+'</strong>'+
+      '</div>'+
+    '</div>';
+  });
+
+  html+='</div>';
+  document.getElementById('p-escolas').innerHTML=html;
+}
+
+// ════════════════════════════════════════════
+//  RENDER DESCONTOS
+// ════════════════════════════════════════════
+function renderDescontos(){
+  var html='<div class="info">Configure os descontos de cada escola. Use os botões de <strong>5% em 5%</strong> ou clique em <strong>Personalizado</strong> para digitar qualquer valor. O desconto principal é sobre o valor bruto. O adicional acumula com o principal.</div><div class="cols3">';
+
+  EIDS.forEach(function(eid){
+    var d=DEF[eid], e=ST[eid], m=getMod(eid);
+    if(!e.ativa){html+='<div class="disc-card" style="opacity:.45"><div class="disc-school-hdr"><strong style="color:'+d.cor+'">'+d.nome+'</strong><span style="font-size:.72rem;color:#9ca3af">Escola desativada</span></div></div>';return;}
+
+    var escola=calcEscola(eid);
+    var eco=m.bruto-escola;
+    var pct_total=e.disc1+e.disc2;
+
+    // ref discounts
+    var refHtml='<div class="disc-ref"><strong style="font-size:.72rem">✅ Descontos confirmados/disponíveis:</strong><br>'+
+      m.disc_ref.map(function(r){return '<div class="disc-ref-item">· '+r+'</div>';}).join('')+
+    '</div>';
+    var warnHtml=m.disc_warn?'<div class="disc-warn">⚠️ '+m.disc_warn+'</div>':'';
+
+    // Pentágono Semi: bloqueia disc principal (15% só no Regular)
+    var pentSemiBloq = eid==='pentagono' && e.midx>0;
+    var btn1;
+    if(pentSemiBloq){
+      btn1='<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:7px;padding:8px 10px;font-size:.75rem;color:#dc2626">'+
+        '🚫 <strong>Desconto 15% Gênesis 2 não se aplica a esta modalidade.</strong><br>'+
+        '<span style="color:#6b7280">Exclusivo do Regular. Nenhum desconto principal disponível para '+m.label+'.</span>'+
+        '<br><strong style="font-size:.8rem">Desconto principal fixado em 0%.</strong>'+
+      '</div>';
+    } else {
+      btn1=PCTS.map(function(p){
+        return '<button class="pct-btn'+(e.disc1===p&&!e.custom1?' on':'')+'" onclick="setDisc(\''+eid+'\',1,'+p+')">'+p+'%</button>';
+      }).join('')+
+      '<button class="pct-btn'+(e.custom1?' on':'')+'" onclick="setCustom(\''+eid+'\',1)">✏️ Personalizado</button>'+
+      (e.custom1?'<input class="pct-custom" type="number" min="0" max="99" step="0.5" value="'+e.disc1+'" onchange="setDiscVal(\''+eid+'\',1,+this.value)" oninput="setDiscVal(\''+eid+'\',1,+this.value)">':'');
+    }
+
+    // botões disc2
+    var btn2=PCTS.map(function(p){
+      return '<button class="pct-btn'+(e.disc2===p&&!e.custom2?' on':'')+'" onclick="setDisc(\''+eid+'\',2,'+p+')">'+p+'%</button>';
+    }).join('')+
+    '<button class="pct-btn'+(e.custom2?' on':'')+'" onclick="setCustom(\''+eid+'\',2)">✏️ Personalizado</button>'+
+    (e.custom2?'<input class="pct-custom" type="number" min="0" max="99" step="0.5" value="'+e.disc2+'" onchange="setDiscVal(\''+eid+'\',2,+this.value)" oninput="setDiscVal(\''+eid+'\',2,+this.value)">':'');
+
+    html+='<div class="disc-card">'+
+      '<div class="disc-school-hdr">'+
+        '<div><strong style="color:'+d.cor+'">'+d.nome+'</strong><div style="font-size:.7rem;color:#6b7280">'+m.label+'</div></div>'+
+        '<div style="text-align:right">'+
+          '<div style="font-size:.72rem;color:#9ca3af;text-decoration:line-through">'+R(m.bruto)+'</div>'+
+          '<div style="font-size:1rem;font-weight:900;color:'+d.cor+'">'+R(escola)+'</div>'+
+          (pct_total>0?'<div style="font-size:.7rem;color:#059669">−'+Rp(pct_total)+' ('+R(eco)+')</div>':'')+
+        '</div>'+
+      '</div>'+
+      refHtml+warnHtml+
+      '<div class="disc-section">'+
+        '<div class="disc-section-title">Desconto Principal</div>'+
+        '<div class="pct-row">'+btn1+'</div>'+
+      '</div>'+
+      '<div class="disc-section">'+
+        '<div class="disc-section-title">Desconto Adicional (acumula)</div>'+
+        '<div class="pct-row">'+btn2+'</div>'+
+      '</div>'+
+      '<div class="price-flow">'+
+        '<span class="price-bruto">'+R(m.bruto)+'</span>'+
+        '<span class="price-arrow">→</span>'+
+        (e.disc1>0?'<span style="font-size:.75rem;color:#6b7280">−'+e.disc1+'%</span><span class="price-arrow">→</span>':'')+
+        (e.disc2>0?'<span style="font-size:.75rem;color:#6b7280">−'+e.disc2+'%</span><span class="price-arrow">→</span>':'')+
+        '<span class="price-final" style="color:'+d.cor+'">'+R(escola)+'</span>'+
+        (pct_total>0?'<span class="price-eco">economia '+R(eco)+'/mês</span>':'')+
+      '</div>'+
+    '</div>';
+  });
+
+  html+='</div>';
+  document.getElementById('p-descontos').innerHTML=html;
+}
+
+// ════════════════════════════════════════════
+//  RENDER ATIVIDADES
+// ════════════════════════════════════════════
+function renderAtividades(){
+  var eqItems=ATVS.map(function(a){
+    return '<div class="eq-item'+(EQ[a.k]?' on':'')+'" onclick="toggleEQ(\''+a.k+'\')">'+
+      '<div class="icon">'+a.icon+'</div>'+
+      '<div class="lbl">'+a.l.replace(/^[^\s]+ /,'')+'</div>'+
+    '</div>';
+  }).join('');
+
+  var html='<div class="eq-global">'+
+    '<div class="eq-title">🎯 Equalização Global — itens incluídos em TODAS as escolas para comparação justa</div>'+
+    '<div class="eq-grid">'+eqItems+'</div>'+
+    '<div style="font-size:.73rem;color:#4338ca;margin-top:8px">Itens selecionados são incluídos em todas as escolas. Configure o status de cada item (Incluso/Externo/Não incluir) individualmente abaixo.</div>'+
+  '</div>';
+
+  html+='<div class="cols3">';
+  EIDS.forEach(function(eid){
+    var d=DEF[eid], e=ST[eid], m=getMod(eid);
+    if(!e.ativa){html+='<div class="card" style="opacity:.45"><div style="color:'+d.cor+';font-weight:700">'+d.nome+'</div><div style="font-size:.75rem;color:#9ca3af;margin-top:6px">Escola desativada</div></div>';return;}
+
+    var rows=ATVS.map(function(a){
+      var cfg=e.atv[a.k];
+      var isActive=EQ[a.k];
+      var nota=cfg.n?'<span style="color:#9ca3af;font-size:.68rem"> — '+cfg.n+'</span>':'';
+      var custoCell=cfg.s==='ext'
+        ?'<input class="custo-in" type="number" min="0" step="10" value="'+cfg.c+'" onchange="setCusto(\''+eid+'\',\''+a.k+'\',+this.value)">'
+        :'<input class="custo-in" value="—" disabled>';
+      var rowStyle=isActive?'':'opacity:.4;';
+      return '<tr style="'+rowStyle+'">'+
+        '<td><span style="font-size:.85rem">'+a.icon+'</span> '+a.l.replace(/^[^\s]+ /,'')+''+nota+'</td>'+
+        '<td><div class="atv-btns">'+
+          '<button class="atv-btn'+(cfg.s==='inc'?' inc':'')+'" onclick="setAtv(\''+eid+'\',\''+a.k+'\',\'inc\')">✅ Incluso</button>'+
+          '<button class="atv-btn'+(cfg.s==='ext'?' ext':'')+'" onclick="setAtv(\''+eid+'\',\''+a.k+'\',\'ext\')">➕ Externo</button>'+
+          '<button class="atv-btn'+(cfg.s==='nao'?' nao':'')+'" onclick="setAtv(\''+eid+'\',\''+a.k+'\',\'nao\')">— Não</button>'+
+        '</div></td>'+
+        '<td>'+custoCell+'</td>'+
+      '</tr>';
+    }).join('');
+
+    var extras=calcExtras(eid), total=calcTotal(eid).t;
+    html+='<div class="card" style="border-top:3px solid '+d.cor+'">'+
+      '<div class="card-h"><div class="cor" style="background:'+d.cor+'"></div><span style="color:'+d.cor+'">'+d.nome+'</span><span style="font-size:.72rem;color:#6b7280;font-weight:400">'+m.label.split(' — ')[0]+'</span></div>'+
+      '<table class="atv-tbl"><thead><tr><th style="width:30%">Atividade</th><th>Status</th><th style="width:85px">R$/mês</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+      '<div class="tot-footer"><span style="font-size:.74rem;color:#6b7280">Escola '+R(calcEscola(eid))+' + Extras '+R(extras)+'</span><strong style="color:'+d.cor+'">Total '+R(total)+'</strong></div>'+
+    '</div>';
+  });
+  html+='</div>';
+  document.getElementById('p-atividades').innerHTML=html;
+}
+
+// ════════════════════════════════════════════
+//  RENDER RESUMO
+// ════════════════════════════════════════════
+function renderResumo(){
+  var ativas=EIDS.filter(function(eid){return ST[eid].ativa;});
+  if(!ativas.length){document.getElementById('p-resumo').innerHTML='<p style="color:#9ca3af;text-align:center;padding:40px">Ative pelo menos uma escola na aba Escolas</p>';return;}
+
+  var bds=ativas.map(function(eid){return {eid:eid,bd:calcTotal(eid),proj:calcProj(eid)};}).sort(function(a,b){return a.bd.t-b.bd.t;});
+  var minT=bds[0].bd.t, minP=Math.min.apply(null,bds.map(function(x){return x.proj.tot;}));
+  var rCls=['r1','r2','r3'];
+
+  var cards='<div class="cols3">'+bds.map(function(item,i){
+    var d=DEF[item.eid], m=getMod(item.eid), bd=item.bd, proj=item.proj;
+    // activities summary
+    var incl=ATVS.filter(function(a){return ST[item.eid].atv[a.k].s==='inc'&&EQ[a.k];}).map(function(a){return a.icon;}).join('');
+    var exts=ATVS.filter(function(a){return ST[item.eid].atv[a.k].s==='ext'&&EQ[a.k];}).map(function(a){return a.icon;}).join('');
+    return '<div class="sum-card" style="border-left-color:'+d.cor+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div>'+
+          '<strong style="color:'+d.cor+'">'+d.nome+'</strong>'+
+          '<div style="font-size:.7rem;color:#6b7280;margin-top:1px">'+m.label.split(' — ')[0]+'</div>'+
+          '<div style="font-size:.7rem;color:#6b7280">'+
+            (ST[item.eid].disc1+ST[item.eid].disc2>0?'Desconto: '+(ST[item.eid].disc1+ST[item.eid].disc2)+'%':'')+
+          '</div>'+
+        '</div>'+
+        '<span class="rank-pill '+(rCls[i]||'r3')+'">#'+(i+1)+'</span>'+
+      '</div>'+
+      '<div class="sum-total" style="color:'+d.cor+'">'+R(bd.t)+'</div>'+
+      '<div class="sum-sub">/mês total</div>'+
+      '<div style="font-size:.75rem;color:#6b7280;margin-top:8px;line-height:1.8">'+
+        'Escola: '+R(bd.e)+'<br>Extras: '+R(bd.x)+'<br>'+
+        (incl?'<span class="badge-inc">Incluso: '+incl+'</span> ':'')+(exts?'<span class="badge-ext">Externo: '+exts+'</span>':'')+
+        '<br><strong>Projeção 5 anos: '+R(proj.tot)+'</strong>'+
+      '</div>'+
+      (bd.t===minT?'<div style="font-size:.7rem;color:#059669;margin-top:4px">🏆 Menor mensalidade</div>':'')+
+      (proj.tot===minP?'<div style="font-size:.7rem;color:#059669">📈 Menor custo 5 anos</div>':'')+
+    '</div>';
+  }).join('')+'</div>';
+
+  var top=bds[0], projTop=ativas.find(function(eid){return calcProj(eid).tot===minP;});
+  var diff=bds.length>1?bds[1].bd.t-bds[0].bd.t:0;
+  var analise='<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:14px">'+
+    '<strong style="color:#3730a3">🤖 Análise</strong><br><br>'+
+    '<div style="font-size:.82rem;color:#312e81;line-height:2">'+
+      '🥇 Menor custo mensal: <strong>'+DEF[top.eid].nome+'</strong> ('+getMod(top.eid).label.split(' — ')[0]+') — <strong>'+R(top.bd.t)+'/mês</strong><br>'+
+      (bds.length>1?'💰 Economia vs 2º lugar: <strong>'+R(diff*12)+'/ano</strong> ('+R(diff)+'/mês)<br>':'')+
+      '📈 Menor custo 5 anos: <strong>'+DEF[projTop].nome+'</strong> — <strong>'+R(calcProj(projTop).tot)+'</strong>'+
+    '</div>'+
+    '<div style="background:#fff;border-radius:8px;padding:10px;margin-top:10px;font-size:.75rem;color:#4b5563">'+
+      '💡 Configure descontos na aba <strong>🏷️ Descontos</strong> e atividades em <strong>🎯 Atividades</strong> para personalizar a comparação.'+
+    '</div>'+
+  '</div>';
+
+  document.getElementById('p-resumo').innerHTML=cards+analise;
+}
+
+// ════════════════════════════════════════════
+//  RENDER COMPARAR
+// ════════════════════════════════════════════
+function renderComparar(){
+  var ativas=EIDS.filter(function(eid){return ST[eid].ativa;});
+  if(!ativas.length){document.getElementById('p-comparar').innerHTML='<p style="color:#9ca3af;text-align:center;padding:40px">Ative escolas na aba Escolas</p>';return;}
+
+  var bds=ativas.map(function(eid){return calcTotal(eid);});
+  var projs=ativas.map(function(eid){return calcProj(eid);});
+  var minT=Math.min.apply(null,bds.map(function(b){return b.t;}));
+  var minP=Math.min.apply(null,projs.map(function(p){return p.tot;}));
+
+  var th='<th class="lft">Item</th>'+ativas.map(function(eid){
+    var d=DEF[eid],m=getMod(eid);
+    return '<th style="color:'+d.cor+'">'+d.nome+'<br><span style="font-weight:400;font-size:.7rem;color:#6b7280">'+m.label.split(' — ')[0]+'</span><br><span style="font-size:.68rem;color:#6b7280">Desc: '+(ST[eid].disc1+ST[eid].disc2)+'%</span></th>';
+  }).join('');
+
+  var tbody='';
+  // atividades rows
+  ATVS.forEach(function(a){
+    if(!EQ[a.k])return;
+    var cells=ativas.map(function(eid){
+      var cfg=ST[eid].atv[a.k];
+      if(cfg.s==='inc') return '<td style="color:#16a34a;font-size:.74rem">✅ Incluso</td>';
+      if(cfg.s==='nao') return '<td style="color:#9ca3af;font-size:.74rem">—</td>';
+      return '<td>'+R(cfg.c)+'</td>';
+    }).join('');
+    tbody+='<tr><td class="lft">'+a.l+'</td>'+cells+'</tr>';
+  });
+
+  // subtotais
+  tbody+='<tr><td class="lft" style="color:#9ca3af;font-size:.73rem">Mensalidade escola</td>'+ativas.map(function(eid){return '<td>'+R(calcEscola(eid))+'</td>';}).join('')+'</tr>';
+  tbody+='<tr><td class="lft" style="color:#9ca3af;font-size:.73rem">Total extras</td>'+bds.map(function(b){return '<td>'+R(b.x)+'</td>';}).join('')+'</tr>';
+  tbody+='<tr class="rbold"><td class="lft">TOTAL MENSAL</td>'+bds.map(function(b){return '<td class="'+(b.t===minT?'bv':'')+'">'+(b.t===minT?'🏆 ':'')+R(b.t)+(b.t===minT?'<span class="bl">menor</span>':'')+'</td>';}).join('')+'</tr>';
+  tbody+='<tr class="rproj"><td class="lft">Total 5 anos</td>'+projs.map(function(p){return '<td class="'+(p.tot===minP?'bv':'')+'">'+(p.tot===minP?'🏆 ':'')+R(p.tot)+(p.tot===minP?'<span class="bl">menor</span>':'')+'</td>';}).join('')+'</tr>';
+
+  var infoR=[
+    {l:'Reajuste/ano',fn:function(eid){return Rp(getMod(eid).reaj*100);}},
+    {l:'Turno',fn:function(eid){var m=getMod(eid);return m.turno.e+'–'+m.turno.s+' ('+m.turno.h.toFixed(1)+'h)';}},
+    {l:'Contra-turno',fn:function(eid){var c=getMod(eid).contraturno;return c?c.e+'–'+c.s+' ('+c.h+'h, '+c.d+'x/sem)':'—';}},
+    {l:'Horas/dia',fn:function(eid){var m=getMod(eid);return (m.turno.h+(m.contraturno?m.contraturno.h:0)).toFixed(1)+'h';}},
+    {l:'Inglês',fn:function(eid){return DEF[eid].ingles;}},
+    {l:'Distância',fn:function(eid){return DEF[eid].dist;}},
+    {l:'Ranking ENEM',fn:function(eid){return DEF[eid].enem;}},
+  ];
+  tbody+=infoR.map(function(r){return '<tr><td class="lft" style="color:#9ca3af;font-size:.73rem">'+r.l+'</td>'+ativas.map(function(eid){return '<td style="color:#6b7280;font-size:.73rem">'+r.fn(eid)+'</td>';}).join('')+'</tr>';}).join('');
+
+  document.getElementById('p-comparar').innerHTML='<div style="overflow-x:auto"><table class="cmp"><thead><tr>'+th+'</tr></thead><tbody>'+tbody+'</tbody></table></div>';
+}
+
+// ════════════════════════════════════════════
+//  RENDER PROJEÇÃO
+// ════════════════════════════════════════════
+function renderProjecao(){
+  var ativas=EIDS.filter(function(eid){return ST[eid].ativa;});
+  if(!ativas.length){document.getElementById('p-projecao').innerHTML='<p style="color:#9ca3af;text-align:center;padding:40px">Ative escolas na aba Escolas</p>';return;}
+
+  var anos=[2027,2028,2029,2030,2031];
+  var projs=ativas.map(function(eid){return {eid:eid,p:calcProj(eid)};});
+  var minP=Math.min.apply(null,projs.map(function(x){return x.p.tot;}));
+
+  var th='<th class="lft">Ano</th>'+ativas.map(function(eid){
+    var d=DEF[eid];
+    return '<th style="color:'+d.cor+'">'+d.nome+'<br><span style="font-weight:400;font-size:.7rem">'+(getMod(eid).reaj*100).toFixed(1)+'%/ano</span></th>';
+  }).join('');
+
+  var tbody=anos.map(function(ano,i){
+    var vals=projs.map(function(x){return x.p.anos[i];});
+    var minV=Math.min.apply(null,vals);
+    return '<tr><td class="lft"><strong>'+ano+'</strong></td>'+vals.map(function(v){return '<td class="'+(v===minV?'bv':'')+'">'+R(v)+(v===minV?' 🏆':'')+'</td>';}).join('')+'</tr>';
+  }).join('');
+  tbody+='<tr class="rproj"><td class="lft">TOTAL 5 ANOS</td>'+projs.map(function(x){return '<td class="'+(x.p.tot===minP?'bv':'')+'">'+R(x.p.tot)+(x.p.tot===minP?'<span class="bl">🏆 menor</span>':'')+'</td>';}).join('')+'</tr>';
+
+  document.getElementById('p-projecao').innerHTML=
+    '<div class="warn">Reajuste histórico por escola: Anglo 12,5%/ano · Maple 9%/ano · Pentágono 8,7%/ano. Aplicado sobre o total mensal atual. 13 parcelas/ano.</div>'+
+    '<div style="overflow-x:auto"><table class="cmp"><thead><tr>'+th+'</tr></thead><tbody>'+tbody+'</tbody></table></div>';
+}
+
+// ════════════════════════════════════════════
+//  AÇÕES
+// ════════════════════════════════════════════
+function toggleE(eid,v){ST[eid].ativa=v;render();}
+
+function setMod(eid,idx){
+  ST[eid].midx=idx;
+  ST[eid].atv=JSON.parse(JSON.stringify(DEF[eid].mods[idx].pad));
+  // Pentágono: 15% Gênesis 2 só no Regular (idx=0); Semi: força disc1=0
+  ST[eid].disc1=discPadraoD1(eid,idx);
+  ST[eid].custom1=false;
+  render();
+}
+
+function setDisc(eid,n,pct){
+  if(n===1){
+    // Pentágono Semi: disc1 bloqueado em 0
+    if(eid==='pentagono'&&ST[eid].midx>0) return;
+    ST[eid].disc1=pct; ST[eid].custom1=false;
+  } else {
+    ST[eid].disc2=pct; ST[eid].custom2=false;
+  }
+  render();
+}
+
+function setCustom(eid,n){
+  if(n===1){ST[eid].custom1=true;}
+  else{ST[eid].custom2=true;}
+  render();
+}
+
+function setDiscVal(eid,n,v){
+  if(n===1){
+    if(eid==='pentagono'&&ST[eid].midx>0) return;
+    ST[eid].disc1=v;
+  } else {
+    ST[eid].disc2=v;
+  }
+  render();
+}
+
+function setAtv(eid,k,s){
+  ST[eid].atv[k].s=s;
+  if(s!=='ext')ST[eid].atv[k].c=0;
+  else if(!ST[eid].atv[k].c)ST[eid].atv[k].c=DEF[eid].mods[ST[eid].midx].pad[k].c||0;
+  render();
+}
+
+function setCusto(eid,k,v){ST[eid].atv[k].c=v;render();}
+
+function toggleEQ(k){EQ[k]=!EQ[k];render();}
+
+function T(el,id){
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  document.getElementById('p-'+id).classList.add('on');
+  el.classList.add('on');
+}
+
+function render(){
+  renderEscolas();
+  renderDescontos();
+  renderAtividades();
+  renderResumo();
+  renderComparar();
+  renderProjecao();
+}
+
+render();
+</script>
+</body>
+</html>

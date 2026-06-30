@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Comparativo de Escolas — Gustavo 2026/2027</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; }
+  .card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .best { background: linear-gradient(135deg, #ffd700 0%, #ffec6e 100%); }
+  .good { background: linear-gradient(135deg, #c6efce 0%, #e8f5e9 100%); }
+  .warn { background: linear-gradient(135deg, #ffeb9c 0%, #fff8dc 100%); }
+  .bad  { background: linear-gradient(135deg, #ffc7ce 0%, #ffe4e8 100%); }
+  input[type=range] { accent-color: #4f46e5; }
+  .tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; font-weight: 700; }
+  .tab { cursor: pointer; padding: 10px 16px; border-bottom: 3px solid transparent; color: #6b7280; transition: all 0.2s; }
+  .tab:hover { color: #4f46e5; }
+  .school-toggle { transition: all 0.2s; }
+  .school-toggle:hover { transform: scale(1.02); }
+  select { background: white; }
+  @media (max-width: 768px) { .overflow-x-auto { overflow-x: auto; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const { useState, useMemo, useCallback } = React;
+
+const SCHOOLS_BASE = [
+  {
+    id: "anglo25",
+    nome: "Anglo Da Vinci",
+    modalidade: "25% desc.",
+    tag: "⚠️ Formalizar",
+    cor: "#6366f1",
+    corLight: "#eef2ff",
+    mensalidadeBruta: 6826.26,
+    descontoBase: 0.25,
+    descontoBaseLabel: "25% parceria",
+    temDescontoAnual: true,
+    descontoAnualCartao: 0.03,
+    descontoAnualBoleto: 0.05,
+    temDescontoSemestral: false,
+    temDescontoPontualidade: false,
+    natacaoExterna: true,
+    custoNatacao: 715,
+    futsal: true,
+    custoFutsal: 280,
+    materialAnual: 3850,
+    alimentacaoMensal: 0,
+    matricula: 900,
+    reajusteAnual: 0.125,
+    horarioEntrada: "7h20",
+    horarioSaida: "15h30",
+    horasDia: 8.17,
+    metodo: "Aprender a Estudar",
+    ingles: "Cambridge ✓",
+    distancia: "~15–25 min",
+    pros: [
+      "Melhor ranking ENEM (Top 5 SP)",
+      "Cambridge incluso na mensalidade",
+      "Horário estendido (8h10/dia)",
+      "Método estruturado de estudos",
+    ],
+    contras: [
+      "Maior reajuste histórico (10–15%/ano + degrau letivo)",
+      "Desconto revisável a qualquer momento",
+      "Alimentação a confirmar (risco de custo oculto)",
+      "Prazo urgente 20/06 ⚠️",
+      "Material R$3.850/ano (reajuste previsto)",
+    ],
+    alertas: ["🔴 Formalizar 35% por escrito", "🔴 Prazo: 20/06/2026"],
+  },
+  {
+    id: "anglo35",
+    nome: "Anglo Da Vinci",
+    modalidade: "35% desc. ⭐",
+    tag: "⚠️ Formalizar",
+    cor: "#6366f1",
+    corLight: "#eef2ff",
+    mensalidadeBruta: 6826.26,
+    descontoBase: 0.35,
+    descontoBaseLabel: "35% parceria ⭐",
+    temDescontoAnual: true,
+    descontoAnualCartao: 0.03,
+    descontoAnualBoleto: 0.05,
+    temDescontoSemestral: false,
+    temDescontoPontualidade: false,
+    natacaoExterna: true,
+    custoNatacao: 715,
+    futsal: true,
+    custoFutsal: 280,
+    materialAnual: 3850,
+    alimentacaoMensal: 0,
+    matricula: 900,
+    reajusteAnual: 0.125,
+    horarioEntrada: "7h20",
+    horarioSaida: "15h30",
+    horasDia: 8.17,
+    metodo: "Aprender a Estudar",
+    ingles: "Cambridge ✓",
+    distancia: "~15–25 min",
+    pros: [
+      "Maior desconto entre todas as opções",
+      "Cambridge incluso na mensalidade",
+      "Melhor ranking ENEM (Top 5 SP)",
+      "Melhor custo/hora entre todas",
+    ],
+    contras: [
+      "Desconto VERBAL — risco alto se não formalizado",
+      "Maior reajuste histórico (10–15%/ano + degrau)",
+      "Prazo urgentíssimo: 20/06/2026 ⚠️",
+      "Alimentação a confirmar",
+      "Desconto revisável a qualquer momento",
+    ],
+    alertas: ["🔴 URGENTE: formalizar por escrito", "🔴 Prazo: 20/06/2026"],
+  },
+  {
+    id: "maple_manha",
+    nome: "Maple Bear",
+    modalidade: "Só Manhã",
+    tag: "",
+    cor: "#d97706",
+    corLight: "#fffbeb",
+    mensalidadeBruta: 5989.10,
+    descontoBase: 0.10,
+    descontoBaseLabel: "10% irmandade",
+    temDescontoAnual: true,
+    descontoAnualBruto: 0.11,
+    temDescontoSemestral: true,
+    descontoSemestralBruto: 0.07,
+    temDescontoPontualidade: true,
+    descontoPontualidade: 0.05,
+    natacaoExterna: true,
+    custoNatacao: 715,
+    futsal: true,
+    custoFutsal: 280,
+    materialAnual: 4065,
+    alimentacaoMensal: 0,
+    matricula: 0,
+    reajusteAnual: 0.09,
+    horarioEntrada: "7h30",
+    horarioSaida: "12h50",
+    horasDia: 5.33,
+    metodo: "Método canadense",
+    ingles: "Bilíngue canadense ✓",
+    distancia: "~10–15 min",
+    pros: [
+      "Melhor política de descontos (11%+10% cumulativos)",
+      "Reajuste mais previsível (~9%/ano)",
+      "Bilíngue canadense integrado",
+      "Sem taxa de matrícula",
+    ],
+    contras: [
+      "Horário curto (5h20/dia)",
+      "Material SLM+ R$4.065/ano obrigatório + livros",
+      "Sem alimentação inclusa",
+    ],
+    alertas: [],
+  },
+  {
+    id: "maple_ba",
+    nome: "Maple Bear",
+    modalidade: "Manhã + B&A",
+    tag: "",
+    cor: "#d97706",
+    corLight: "#fffbeb",
+    mensalidadeBruta: 8838.10,
+    descontoBase: 0.10,
+    descontoBaseLabel: "10% irmandade",
+    temDescontoAnual: true,
+    descontoAnualBruto: 0.11,
+    temDescontoSemestral: true,
+    descontoSemestralBruto: 0.07,
+    temDescontoPontualidade: true,
+    descontoPontualidade: 0.05,
+    natacaoExterna: true,
+    custoNatacao: 715,
+    futsal: true,
+    custoFutsal: 280,
+    materialAnual: 4065,
+    alimentacaoMensal: 600,
+    matricula: 0,
+    reajusteAnual: 0.09,
+    horarioEntrada: "7h30",
+    horarioSaida: "17h30",
+    horasDia: 10.0,
+    metodo: "Método canadense",
+    ingles: "Bilíngue canadense ✓",
+    distancia: "~10–15 min",
+    pros: [
+      "Maior carga horária (10h/dia)",
+      "Bilíngue canadense integrado",
+      "Almoço e lanche inclusos",
+      "Melhor política de descontos",
+    ],
+    contras: [
+      "Opção mais cara entre todas",
+      "Material SLM+ R$4.065/ano + livros",
+    ],
+    alertas: [],
+  },
+  {
+    id: "penta_reg",
+    nome: "Pentágono",
+    modalidade: "Regular",
+    tag: "15% Gênesis 2",
+    cor: "#059669",
+    corLight: "#ecfdf5",
+    mensalidadeBruta: 4955.51,
+    descontoBase: 0.15,
+    descontoBaseLabel: "15% Gênesis 2",
+    temDescontoAnual: true,
+    descontoAnualLiquido: 0.05,
+    temDescontoSemestral: true,
+    descontoSemestralLiquido: 0.025,
+    temDescontoPontualidade: false,
+    natacaoExterna: true,
+    custoNatacao: 715,
+    futsal: true,
+    custoFutsal: 280,
+    materialAnual: 0,
+    alimentacaoMensal: 0,
+    matricula: 0,
+    reajusteAnual: 0.087,
+    horarioEntrada: "7h30",
+    horarioSaida: "12h30",
+    horasDia: 5.0,
+    metodo: "Educação Humanista",
+    ingles: "Via Red Balloon",
+    distancia: "~5–10 min 🏆",
+    pros: [
+      "Mensalidade mais baixa 🥇",
+      "Menor reajuste histórico (~8,7%/ano)",
+      "Mais perto do Gênesis 2 🏆",
+      "Sem taxa de matrícula",
+      "1º lugar em Santana de Parnaíba",
+    ],
+    contras: [
+      "Horário mais curto (5h/dia)",
+      "Alimentação não inclusa",
+      "Inglês não integrado (depende Red Balloon)",
+    ],
+    alertas: ["Vaga abre agosto/2026"],
+  },
+  {
+    id: "penta_semi3",
+    nome: "Pentágono",
+    modalidade: "Semi Int. 3x",
+    tag: "",
+    cor: "#059669",
+    corLight: "#ecfdf5",
+    mensalidadeBruta: 6702.76,
+    descontoBase: 0,
+    descontoBaseLabel: "Sem desconto Gênesis 2",
+    temDescontoAnual: true,
+    descontoAnualLiquido: 0.05,
+    temDescontoSemestral: true,
+    descontoSemestralLiquido: 0.025,
+    temDescontoPontualidade: false,
+    natacaoExterna: true,
+    custoNatacao: 715,
+    futsal: true,
+    custoFutsal: 280,
+    materialAnual: 0,
+    alimentacaoMensal: 520,
+    matricula: 0,
+    reajusteAnual: 0.087,
+    horarioEntrada: "7h30",
+    horarioSaida: "15h30",
+    horasDia: 6.33,
+    metodo: "Educação Humanista",
+    ingles: "Learn&Play + Cambridge ✓",
+    distancia: "~5–10 min 🏆",
+    pros: [
+      "Inglês Learn&Play+Cambridge incluso",
+      "Mais perto do Gênesis 2 🏆",
+      "Horário estendido 3x/semana",
+    ],
+    contras: [
+      "Sem desconto Gênesis 2 nessa modalidade",
+      "Alimentação ~R$520/mês extra",
+      "Horário irregular (3x estendido, 2x curto)",
+    ],
+    alertas: [],
+  },
+  {
+    id: "penta_semi5",
+    nome: "Pentágono",
+    modalidade: "Semi Int. 5x",
+    tag: "🏊 Natação inclusa",
+    cor: "#059669",
+    corLight: "#ecfdf5",
+    mensalidadeBruta: 6972.15,
+    descontoBase: 0,
+    descontoBaseLabel: "Sem desconto Gênesis 2",
+    temDescontoAnual: true,
+    descontoAnualLiquido: 0.05,
+    temDescontoSemestral: true,
+    descontoSemestralLiquido: 0.025,
+    temDescontoPontualidade: false,
+    natacaoExterna: false,
+    custoNatacao: 0,
+    futsal: true,
+    custoFutsal: 280,
+    materialAnual: 0,
+    alimentacaoMensal: 520,
+    matricula: 0,
+    reajusteAnual: 0.087,
+    horarioEntrada: "7h30",
+    horarioSaida: "15h30",
+    horasDia: 8.0,
+    metodo: "Educação Humanista",
+    ingles: "Learn&Play + Cambridge ✓",
+    distancia: "~5–10 min 🏆",
+    pros: [
+      "Natação inclusa (economia R$715/mês) 🏊",
+      "Inglês Learn&Play+Cambridge incluso",
+      "Horário estendido todos os dias (8h/dia)",
+      "Mais perto do Gênesis 2 🏆",
+    ],
+    contras: [
+      "Sem desconto Gênesis 2 nessa modalidade",
+      "Alimentação ~R$520/mês extra",
+    ],
+    alertas: [],
+  },
+  {
+    id: "penta_semi5nat",
+    nome: "Pentágono",
+    modalidade: "Semi 5x+Nat.",
+    tag: "🏊 Nat. extra",
+    cor: "#059669",
+    corLight: "#ecfdf5",
+    mensalidadeBruta: 6972.15,
+    descontoBase: 0,
+    descontoBaseLabel: "Sem desconto Gênesis 2",
+    temDescontoAnual: true,
+    descontoAnualLiquido: 0.05,
+    temDescontoSemestral: true,
+    descontoSemestralLiquido: 0.025,
+    temDescontoPontualidade: false,
+    natacaoExterna: false,
+    custoNatacao: 507,
+    futsal: true,
+    custoFutsal: 280,
+    materialAnual: 0,
+    alimentacaoMensal: 520,
+    matricula: 0,
+    reajusteAnual: 0.087,
+    horarioEntrada: "7h30",
+    horarioSaida: "15h30",
+    horasDia: 8.0,
+    metodo: "Educação Humanista",
+    ingles: "Learn&Play + Cambridge ✓",
+    distancia: "~5–10 min 🏆",
+    pros: [
+      "Natação inclusa (1x) + avulsa extra",
+      "Inglês Learn&Play+Cambridge incluso",
+      "Horário estendido (8h/dia)",
+    ],
+    contras: [
+      "Opção mais cara do Pentágono no total",
+      "Sem desconto Gênesis 2",
+      "Alimentação ~R$520/mês extra",
+    ],
+    alertas: [],
+  },
+];
+
+const RED_BALLOON = 1550.77;
+
+function calcMensalidade(school, ajustes) {
+  const bruto = school.mensalidadeBruta;
+  const descBase = school.descontoBase || 0;
+  const liquido = bruto * (1 - descBase);
+  let final = liquido;
+  const modoDesconto = ajustes.modoDesconto || "base";
+
+  if (modoDesconto === "semestral") {
+    if (school.id.startsWith("maple") && school.temDescontoSemestral) {
+      final = bruto * (1 - descBase) * (1 - school.descontoSemestralBruto);
+    } else if (school.id.startsWith("penta") && school.temDescontoSemestral) {
+      final = liquido * (1 - school.descontoSemestralLiquido);
+    }
+  } else if (modoDesconto === "anual") {
+    if (school.id.startsWith("maple") && school.temDescontoAnual) {
+      final = bruto * (1 - descBase) * (1 - school.descontoAnualBruto);
+    } else if (school.id.startsWith("penta") && school.temDescontoAnual) {
+      final = liquido * (1 - school.descontoAnualLiquido);
+    } else if (school.id.startsWith("anglo") && school.temDescontoAnual) {
+      const extDesc = ajustes.angloFormaPgto === "cartao"
+        ? school.descontoAnualCartao
+        : school.descontoAnualBoleto;
+      final = liquido * (1 - extDesc);
+    }
+  }
+
+  if (modoDesconto !== "base" && school.temDescontoPontualidade && ajustes.pontualidade) {
+    if (school.id.startsWith("maple")) {
+      final = final * (1 - school.descontoPontualidade);
+    }
+  }
+
+  return final;
+}
+
+function calcTotal(school, ajustes, configs) {
+  const mensEscola = calcMensalidade(school, ajustes);
+  const natacao = configs.incluirNatacao
+    ? (school.natacaoExterna ? configs.custoNatacao : school.custoNatacao)
+    : 0;
+  const futsal = configs.incluirFutsal ? configs.custoFutsal : 0;
+  const rb = configs.incluirRedBalloon ? configs.custoRedBalloon : 0;
+  const alim = configs.incluirAlimentacao ? school.alimentacaoMensal : 0;
+  const mat = configs.incluirMaterial ? (school.materialAnual / 12) : 0;
+  return { escola: mensEscola, natacao, futsal, redBalloon: rb, alimentacao: alim, material: mat,
+    total: mensEscola + natacao + futsal + rb + alim + mat };
+}
+
+function fmt(v) {
+  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function projecao5Anos(school, ajustes, configs) {
+  const base = calcTotal(school, ajustes, configs).total;
+  const reaj = school.reajusteAnual;
+  let total = 0;
+  const anos = [];
+  for (let i = 0; i < 5; i++) {
+    const val = base * Math.pow(1 + reaj, i);
+    total += val * 13;
+    anos.push(val);
+  }
+  return { anos, total };
+}
+
+function Badge({ text, color }) {
+  return (
+    <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: color + "22", color }}>
+      {text}
+    </span>
+  );
+}
+
+function SchoolCard({ school, breakdown, rank, isSelected, onToggle }) {
+  const rankColors = ["best", "good", "good", "warn", "warn", "", "", "bad"];
+  const cl = rankColors[rank - 1] || "";
+  return (
+    <div
+      className={`card p-4 cursor-pointer school-toggle border-2 ${isSelected ? "border-indigo-500" : "border-transparent"}`}
+      onClick={onToggle}
+    >
+      <div className="flex justify-between items-start mb-2">
+        <div>
+          <div className="font-bold text-sm" style={{ color: school.cor }}>{school.nome}</div>
+          <div className="text-xs text-gray-500">{school.modalidade}</div>
+          {school.tag && <div className="text-xs mt-1 text-orange-600 font-medium">{school.tag}</div>}
+        </div>
+        <div className="text-right">
+          <div className={`text-xs font-bold px-2 py-1 rounded-full ${cl}`}>#{rank}</div>
+          <div className="mt-1">
+            <input type="checkbox" checked={isSelected} onChange={onToggle} className="w-4 h-4 accent-indigo-600" onClick={e => e.stopPropagation()} />
+          </div>
+        </div>
+      </div>
+      <div className="text-xl font-black mt-2" style={{ color: school.cor }}>{fmt(breakdown.total)}</div>
+      <div className="text-xs text-gray-400">/mês total</div>
+      <div className="text-xs mt-2 text-gray-500">Escola: {fmt(breakdown.escola)}</div>
+      {school.alertas.length > 0 && (
+        <div className="mt-2 text-xs text-red-600 bg-red-50 rounded p-1">{school.alertas[0]}</div>
+      )}
+    </div>
+  );
+}
+
+function CompareTable({ schools, breakdowns, ajustes, configs }) {
+  const rows = [
+    { label: "Mensalidade escola", key: "escola" },
+    { label: "Natação", key: "natacao" },
+    { label: "Futsal", key: "futsal" },
+    { label: "Red Balloon", key: "redBalloon" },
+    { label: "Alimentação", key: "alimentacao" },
+    { label: "Material (÷12)", key: "material" },
+    { label: "TOTAL MENSAL", key: "total", bold: true },
+  ];
+  const projecoes = schools.map(s => projecao5Anos(s, ajustes, configs));
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b-2">
+            <th className="text-left py-2 pr-4 text-gray-500 font-medium w-40">Item</th>
+            {schools.map(s => (
+              <th key={s.id} className="text-center py-2 px-2 font-bold" style={{ color: s.cor }}>
+                <div>{s.nome}</div>
+                <div className="text-xs font-normal text-gray-500">{s.modalidade}</div>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(row => {
+            const vals = breakdowns.map(b => b[row.key]);
+            const minVal = Math.min(...vals.filter(v => v > 0));
+            return (
+              <tr key={row.label} className={`border-b ${row.bold ? "bg-indigo-50" : ""}`}>
+                <td className={`py-2 pr-4 ${row.bold ? "font-bold text-indigo-900" : "text-gray-600"}`}>{row.label}</td>
+                {vals.map((v, i) => (
+                  <td key={i} className={`text-center py-2 px-2 ${row.bold ? "font-black text-base" : ""}`}
+                    style={row.bold && v === minVal ? { color: "#059669" } : {}}>
+                    {v === 0 ? <span className="text-gray-300">—</span> : fmt(v)}
+                    {row.bold && v === minVal && <div className="text-xs text-green-600">🏆 menor</div>}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+          <tr className="border-b-2 border-gray-300 bg-yellow-50">
+            <td className="py-2 pr-4 font-bold text-yellow-800">Total 5 anos</td>
+            {projecoes.map((p, i) => {
+              const minTotal = Math.min(...projecoes.map(x => x.total));
+              return (
+                <td key={i} className={`text-center py-2 px-2 font-bold ${p.total === minTotal ? "text-green-700" : "text-gray-700"}`}>
+                  {fmt(p.total)}
+                  {p.total === minTotal && <div className="text-xs text-green-600">🏆</div>}
+                </td>
+              );
+            })}
+          </tr>
+          <tr><td className="py-1 pr-4 text-xs text-gray-400">Reajuste/ano</td>
+            {schools.map(s => <td key={s.id} className="text-center py-1 px-2 text-xs text-gray-400">{(s.reajusteAnual*100).toFixed(1)}%</td>)}
+          </tr>
+          <tr><td className="py-1 pr-4 text-xs text-gray-400">Horas/dia</td>
+            {schools.map(s => <td key={s.id} className="text-center py-1 px-2 text-xs text-gray-400">{s.horasDia}h</td>)}
+          </tr>
+          <tr><td className="py-1 pr-4 text-xs text-gray-400">Distância</td>
+            {schools.map(s => <td key={s.id} className="text-center py-1 px-2 text-xs text-gray-400">{s.distancia}</td>)}
+          </tr>
+          <tr><td className="py-1 pr-4 text-xs text-gray-400">Inglês</td>
+            {schools.map(s => <td key={s.id} className="text-center py-1 px-2 text-xs text-gray-400">{s.ingles}</td>)}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function ProsContras({ schools }) {
+  return (
+    <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${Math.min(schools.length, 2)}, 1fr)` }}>
+      {schools.map(s => (
+        <div key={s.id} className="card p-4 border-l-4" style={{ borderColor: s.cor }}>
+          <div className="font-bold mb-1" style={{ color: s.cor }}>{s.nome}</div>
+          <div className="text-sm text-gray-500 mb-3">{s.modalidade}</div>
+          <div className="mb-3">
+            <div className="text-xs font-bold text-green-700 mb-1">✅ PRÓS</div>
+            {s.pros.map((p, i) => (
+              <div key={i} className="text-xs text-gray-700 mb-1 flex gap-1">
+                <span className="text-green-500 mt-0.5">•</span><span>{p}</span>
+              </div>
+            ))}
+          </div>
+          <div>
+            <div className="text-xs font-bold text-red-600 mb-1">❌ CONTRAS</div>
+            {s.contras.map((c, i) => (
+              <div key={i} className="text-xs text-gray-700 mb-1 flex gap-1">
+                <span className="text-red-400 mt-0.5">•</span><span>{c}</span>
+              </div>
+            ))}
+          </div>
+          {s.alertas.length > 0 && (
+            <div className="mt-3 bg-red-50 rounded p-2">
+              <div className="text-xs font-bold text-red-600 mb-1">⚠️ ALERTAS</div>
+              {s.alertas.map((a, i) => <div key={i} className="text-xs text-red-700">{a}</div>)}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Projecao5Anos({ schools, ajustes, configs }) {
+  const ANOS = [2027, 2028, 2029, 2030, 2031];
+  const projecoes = schools.map(s => ({ school: s, dados: projecao5Anos(s, ajustes, configs) }));
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b-2">
+            <th className="text-left py-2 pr-4 text-gray-500 font-medium">Ano</th>
+            {schools.map(s => (
+              <th key={s.id} className="text-center py-2 px-2 font-bold" style={{ color: s.cor }}>
+                <div className="text-xs">{s.nome}</div>
+                <div className="text-xs font-normal">{s.modalidade}</div>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {ANOS.map((ano, i) => {
+            const vals = projecoes.map(p => p.dados.anos[i]);
+            const min = Math.min(...vals);
+            return (
+              <tr key={ano} className="border-b">
+                <td className="py-2 pr-4 font-semibold text-gray-700">{ano}</td>
+                {vals.map((v, j) => (
+                  <td key={j} className={`text-center py-2 px-2 ${v === min ? "text-green-700 font-bold" : ""}`}>
+                    {fmt(v)}{v === min && <span className="ml-1 text-green-500">🏆</span>}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+          <tr className="bg-indigo-50 font-black">
+            <td className="py-2 pr-4 text-indigo-900">TOTAL 5 ANOS</td>
+            {projecoes.map((p, i) => {
+              const min = Math.min(...projecoes.map(x => x.dados.total));
+              return (
+                <td key={i} className={`text-center py-2 px-2 text-sm ${p.dados.total === min ? "text-green-700" : "text-gray-700"}`}>
+                  {fmt(p.dados.total)}
+                  {p.dados.total === min && <div className="text-xs text-green-500">🏆 menor</div>}
+                </td>
+              );
+            })}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function App() {
+  const [tab, setTab] = useState("resumo");
+  const [ajustes, setAjustes] = useState({ modoDesconto: "anual", angloFormaPgto: "boleto", pontualidade: true });
+  const [configs, setConfigs] = useState({
+    incluirNatacao: true, incluirFutsal: true, incluirRedBalloon: true,
+    incluirAlimentacao: true, incluirMaterial: true,
+    custoNatacao: 715, custoFutsal: 280, custoRedBalloon: RED_BALLOON,
+  });
+  const [selecionadas, setSelecionadas] = useState(["anglo35", "maple_manha", "penta_reg", "penta_semi5"]);
+
+  const toggleSchool = useCallback((id) => {
+    setSelecionadas(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  }, []);
+
+  const allBreakdowns = useMemo(() => SCHOOLS_BASE.map(s => calcTotal(s, ajustes, configs)), [ajustes, configs]);
+
+  const ranked = useMemo(() => {
+    const sorted = [...SCHOOLS_BASE].map((s, i) => ({ s, total: allBreakdowns[i].total })).sort((a, b) => a.total - b.total);
+    const rankMap = {};
+    sorted.forEach((item, i) => { rankMap[item.s.id] = i + 1; });
+    return rankMap;
+  }, [allBreakdowns]);
+
+  const selectedSchools = SCHOOLS_BASE.filter(s => selecionadas.includes(s.id));
+  const selectedBreakdowns = selectedSchools.map(s => calcTotal(s, ajustes, configs));
+
+  const TABS = [
+    { id: "resumo", label: "📊 Resumo" },
+    { id: "compare", label: "⚖️ Comparar" },
+    { id: "projecao", label: "📈 Projeção 5 Anos" },
+    { id: "proscontras", label: "✅ Prós & Contras" },
+    { id: "ajustes", label: "⚙️ Ajustes" },
+  ];
+
+  return (
+    <div className="min-h-screen p-4 md:p-6">
+      <div className="card p-5 mb-6">
+        <h1 className="text-xl md:text-2xl font-black text-gray-800">🏫 Comparativo de Escolas — Gustavo</h1>
+        <p className="text-sm text-gray-500 mt-1">1º Ano Fundamental · Gênesis 2, Alphaville · 2026/2027</p>
+        <div className="flex flex-wrap gap-2 mt-3">
+          <Badge text={`Modo: ${ajustes.modoDesconto === "base" ? "Desc. base" : ajustes.modoDesconto === "anual" ? "Pagamento anual" : "Pagamento semestral"}`} color="#4f46e5" />
+          {configs.incluirNatacao && <Badge text="🏊 Natação" color="#0891b2" />}
+          {configs.incluirFutsal && <Badge text="⚽ Futsal" color="#16a34a" />}
+          {configs.incluirRedBalloon && <Badge text="🔵 Red Balloon" color="#2563eb" />}
+          {configs.incluirAlimentacao && <Badge text="🍽️ Alimentação" color="#d97706" />}
+          {configs.incluirMaterial && <Badge text="📚 Material" color="#7c3aed" />}
+        </div>
+      </div>
+
+      <div className="card mb-6">
+        <div className="flex overflow-x-auto border-b">
+          {TABS.map(t => (
+            <div key={t.id} className={`tab whitespace-nowrap ${tab === t.id ? "tab-active" : ""}`} onClick={() => setTab(t.id)}>
+              {t.label}
+            </div>
+          ))}
+        </div>
+        <div className="p-4">
+
+          {tab === "resumo" && (
+            <div>
+              <p className="text-sm text-gray-500 mb-4">Clique nos cards para incluir/excluir da comparação detalhada.</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                {SCHOOLS_BASE.map((s, i) => (
+                  <SchoolCard key={s.id} school={s} breakdown={allBreakdowns[i]} rank={ranked[s.id]}
+                    isSelected={selecionadas.includes(s.id)} onToggle={() => toggleSchool(s.id)} />
+                ))}
+              </div>
+              <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+                <div className="font-bold text-indigo-800 mb-2">🤖 Análise Automática</div>
+                {(() => {
+                  const sorted = [...SCHOOLS_BASE].map((s, i) => ({ s, total: allBreakdowns[i].total })).sort((a, b) => a.total - b.total);
+                  const top3 = sorted.slice(0, 3);
+                  const topProj = [...SCHOOLS_BASE].map(s => ({ s, total: projecao5Anos(s, ajustes, configs).total })).sort((a, b) => a.total - b.total)[0];
+                  return (
+                    <div className="text-sm text-indigo-900 space-y-2">
+                      <p>🥇 <strong>Menor custo mensal:</strong> {top3[0].s.nome} {top3[0].s.modalidade} — {fmt(top3[0].total)}/mês</p>
+                      <p>🥈 <strong>2º lugar:</strong> {top3[1].s.nome} {top3[1].s.modalidade} — {fmt(top3[1].total)}/mês</p>
+                      <p>🥉 <strong>3º lugar:</strong> {top3[2].s.nome} {top3[2].s.modalidade} — {fmt(top3[2].total)}/mês</p>
+                      <p>📈 <strong>Menor custo 5 anos:</strong> {topProj.s.nome} {topProj.s.modalidade} — {fmt(topProj.total)}</p>
+                      <div className="mt-2 p-2 bg-white rounded-lg text-xs text-gray-600">
+                        💡 O ranking atualiza em tempo real conforme você muda os ajustes. O Pentágono Regular tem a <strong>menor mensalidade</strong>, mas o Anglo 35% oferece <strong>melhor custo/hora</strong> e <strong>Top 5 ENEM SP</strong>. Atenção: Anglo 35% precisa ser <strong>formalizado por escrito até 20/06</strong>.
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
+
+          {tab === "compare" && (
+            selectedSchools.length === 0
+              ? <p className="text-gray-400 text-center py-8">Selecione pelo menos 1 escola no Resumo</p>
+              : <CompareTable schools={selectedSchools} breakdowns={selectedBreakdowns} ajustes={ajustes} configs={configs} />
+          )}
+
+          {tab === "projecao" && (
+            <div>
+              <div className="text-xs text-gray-500 mb-4 bg-yellow-50 p-3 rounded-lg">
+                ⚠️ Projeção usa reajuste histórico de cada escola (Anglo 12,5%/ano · Maple 9%/ano · Pentágono 8,7%/ano). 13 parcelas/ano.
+              </div>
+              {selectedSchools.length === 0
+                ? <p className="text-gray-400 text-center py-8">Selecione escolas no Resumo</p>
+                : <Projecao5Anos schools={selectedSchools} ajustes={ajustes} configs={configs} />}
+            </div>
+          )}
+
+          {tab === "proscontras" && (
+            selectedSchools.length === 0
+              ? <p className="text-gray-400 text-center py-8">Selecione escolas no Resumo</p>
+              : <ProsContras schools={selectedSchools} />
+          )}
+
+          {tab === "ajustes" && (
+            <div className="space-y-6 max-w-2xl">
+              <div className="card p-4 border border-gray-100">
+                <h3 className="font-bold text-gray-700 mb-3">💳 Forma de Pagamento</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Modo de desconto</label>
+                    <select value={ajustes.modoDesconto} onChange={e => setAjustes(a => ({ ...a, modoDesconto: e.target.value }))}
+                      className="block mt-1 w-full border rounded-lg p-2 text-sm">
+                      <option value="base">Só desconto principal (mensal)</option>
+                      <option value="semestral">Pagamento semestral</option>
+                      <option value="anual">Pagamento anual (melhor desconto)</option>
+                    </select>
+                  </div>
+                  {ajustes.modoDesconto === "anual" && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Anglo — forma (anual)</label>
+                      <select value={ajustes.angloFormaPgto} onChange={e => setAjustes(a => ({ ...a, angloFormaPgto: e.target.value }))}
+                        className="block mt-1 w-full border rounded-lg p-2 text-sm">
+                        <option value="boleto">Boleto (+5%)</option>
+                        <option value="cartao">Cartão (+3%)</option>
+                      </select>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" id="pont" checked={ajustes.pontualidade}
+                      onChange={e => setAjustes(a => ({ ...a, pontualidade: e.target.checked }))} className="w-4 h-4" />
+                    <label htmlFor="pont" className="text-sm text-gray-600">Aplicar desconto pontualidade (Maple Bear 5%)</label>
+                  </div>
+                </div>
+              </div>
+              <div className="card p-4 border border-gray-100">
+                <h3 className="font-bold text-gray-700 mb-3">🎯 Itens Incluídos no Total</h3>
+                <div className="space-y-2">
+                  {[
+                    { key: "incluirNatacao", label: "🏊 Natação" },
+                    { key: "incluirFutsal", label: "⚽ Futsal" },
+                    { key: "incluirRedBalloon", label: "🔵 Red Balloon (inglês externo)" },
+                    { key: "incluirAlimentacao", label: "🍽️ Alimentação (onde aplicável)" },
+                    { key: "incluirMaterial", label: "📚 Material didático (÷12)" },
+                  ].map(item => (
+                    <div key={item.key} className="flex items-center gap-2">
+                      <input type="checkbox" id={item.key} checked={configs[item.key]}
+                        onChange={e => setConfigs(c => ({ ...c, [item.key]: e.target.checked }))} className="w-4 h-4" />
+                      <label htmlFor={item.key} className="text-sm text-gray-600">{item.label}</label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="card p-4 border border-gray-100">
+                <h3 className="font-bold text-gray-700 mb-3">💰 Custos das Atividades</h3>
+                <div className="space-y-4">
+                  {[
+                    { key: "custoNatacao", label: "Natação (externo)", min: 400, max: 1200 },
+                    { key: "custoFutsal", label: "Futsal (externo)", min: 100, max: 600 },
+                    { key: "custoRedBalloon", label: "Red Balloon", min: 1000, max: 2500 },
+                  ].map(item => (
+                    <div key={item.key}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <label className="text-gray-600">{item.label}</label>
+                        <span className="font-bold text-indigo-700">{fmt(configs[item.key])}</span>
+                      </div>
+                      <input type="range" min={item.min} max={item.max} step={10} value={configs[item.key]}
+                        onChange={e => setConfigs(c => ({ ...c, [item.key]: Number(e.target.value) }))} className="w-full" />
+                      <div className="flex justify-between text-xs text-gray-400">
+                        <span>{fmt(item.min)}</span><span>{fmt(item.max)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-800">
+                💡 Todos os cálculos atualizam em tempo real.
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="card p-4 border-l-4 border-red-500">
+        <div className="font-bold text-red-700 mb-2">🚨 Alertas Urgentes</div>
+        <div className="space-y-1 text-sm">
+          <div className="text-red-700">🔴 <strong>Anglo 35%:</strong> Formalizar desconto por escrito — PRAZO 20/06/2026</div>
+          <div className="text-red-700">🔴 <strong>Anglo geral:</strong> Reserva de vaga expira em 20/06/2026</div>
+          <div className="text-orange-700">🟡 <strong>Red Balloon:</strong> 1ª parcela 15% desc. expira 30/06/2026 (economia R$232,62)</div>
+          <div className="text-gray-500 text-xs mt-2">Última atualização dos dados: 16/06/2026</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
