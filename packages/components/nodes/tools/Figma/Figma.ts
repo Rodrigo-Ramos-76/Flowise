@@ -21,7 +21,7 @@ class Figma_Tools implements INode {
         this.type = 'Figma'
         this.icon = 'figma.svg'
         this.category = 'Tools'
-        this.description = 'Allows agents to retrieve content and comments from a Figma file'
+        this.description = 'Allows agents to read a Figma file or UI kit: design tokens, components, content and comments'
         this.baseClasses = [this.type, 'Tool', ...getBaseClasses(FigmaTool)]
         this.credential = {
             label: 'Connect Credential',
